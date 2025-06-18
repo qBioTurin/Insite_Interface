@@ -1,6 +1,15 @@
-import { Grid, GridCol, NumberInput, SimpleGrid } from "@mantine/core";
+'use client'
+import { useGeneralInformationStore } from "@/lib/general-information-store";
+import { Grid, GridCol, NumberInput } from "@mantine/core";
 
 export default function GeneralInformation() {
+	const {
+		setCellLifeDays,
+		setCarryingCapacity,
+		setMutationRate,
+		setMutableBases,
+	} = useGeneralInformationStore();
+
 	return (
 		<>
 
@@ -11,6 +20,7 @@ export default function GeneralInformation() {
 						label="Cell Life (days)"
 						defaultValue={4}
 						hideControls
+						onChange={(val) => setCellLifeDays(Number(val))}
 					/>
 				</GridCol>
 				<GridCol span={6}>
@@ -18,6 +28,7 @@ export default function GeneralInformation() {
 						label="Basic carrying capacity"
 						defaultValue={1e6}
 						hideControls
+						onChange={(val) => setCarryingCapacity(Number(val))}
 					/>
 				</GridCol>
 				<GridCol span={6}>
@@ -25,6 +36,7 @@ export default function GeneralInformation() {
 						label="Basic mutation rate"
 						defaultValue={8e-9}
 						hideControls
+						onChange={(val) => setMutationRate(Number(val))}
 					/>
 				</GridCol>
 				<GridCol span={6}>
@@ -32,6 +44,7 @@ export default function GeneralInformation() {
 						label="Number of possibility-to-mutate base pairs of interest"
 						defaultValue={5000}
 						hideControls
+						onChange={(val) => setMutableBases(Number(val))}
 					/>
 				</GridCol>
 			</Grid>

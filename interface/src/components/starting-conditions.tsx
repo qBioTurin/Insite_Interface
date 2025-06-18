@@ -1,15 +1,29 @@
 import { Grid, GridCol, NumberInput, Text, Stack, NativeSelect, Fieldset, Badge, ActionIcon } from "@mantine/core";
 import { colorsAddButton, colorsAddButtonIcon, colorsPills } from "./colors";
-import { defaultStartingConditions } from "./default-values";
-import { Mutation, Population, Event } from "./interfaces";
+import { Event } from "./interfaces";
 import { IconPlus } from "@tabler/icons-react";
 import PopulationCombobox from "./population-combobox";
+import { useStartingConditionsStore } from "@/lib/starting-conditions-store";
 
-export default function StartingConditions({ populations, mutations, functionalEvents, setMutations, nextMutationId, setNextMutationId, setPopulations, setNextPopulationId, nextPopulationId, updatePopulationsNumberCells, addMutationToPopulation, updateMutationEvent }: { populations: Population[]; mutations: Mutation[]; functionalEvents: Event[]; setMutations: React.Dispatch<React.SetStateAction<Mutation[]>>; nextMutationId: number; setNextMutationId: React.Dispatch<React.SetStateAction<number>>; setPopulations: React.Dispatch<React.SetStateAction<Population[]>>; setNextPopulationId: React.Dispatch<React.SetStateAction<number>>; nextPopulationId: number, updatePopulationsNumberCells: (populationToUpdate: Population, newNumberCells: number) => void, addMutationToPopulation: (population: Population, mutation: Mutation) => void, updateMutationEvent: (mutation: Mutation, newEvent: number) => void }) {
+export default function StartingConditions({ functionalEvents }: { functionalEvents: Event[]}) {
+	const {
+			addMutations,
+			updateNextMutationId,
+			updateMutations,
+			updateNextPopulationId,
+			addPopulation,
+			updatePopulationNumberCells,
+			nextPopulationId,
+			populations,
+			nextMutationId,
+			mutations,
+			setStartingNumberOfCells,
+			startingNumberOfCells
+		} = useStartingConditionsStore();
 	return (
 		<>
 			<h1>Starting Conditions</h1>
-			<NumberInput label="Starting number of cells" defaultValue={defaultStartingConditions} hideControls w={"40%"} />
+			<NumberInput label="Starting number of cells" onChange={(val) => setStartingNumberOfCells(Number(val))} defaultValue={startingNumberOfCells} hideControls w={"40%"} />
 			<Grid mt={40}>
 				<GridCol span={8}>
 					<Fieldset legend="Starting Populations">
@@ -21,17 +35,17 @@ export default function StartingConditions({ populations, mutations, functionalE
 											<Text>{population.name}</Text>
 										</GridCol>
 										<GridCol span={7}>
-											<PopulationCombobox mutations={mutations} addMutationToPopulation={addMutationToPopulation} population={population} />
+											<PopulationCombobox population={population} />
 										</GridCol>
 										<GridCol span={3}>
-											<NumberInput onChange={(val) => updatePopulationsNumberCells(population, Number(val))} defaultValue={population.numberOfCells} label="Number of cells" hideControls />
+											<NumberInput onChange={(val) => updatePopulationNumberCells(population, Number(val))} defaultValue={population.numberOfCells} label="Number of cells" hideControls />
 										</GridCol>
 									</Grid>
 								)
 							})}
 							<ActionIcon onClick={() => {
-								setPopulations([...populations, { id: nextPopulationId, name: `Population${nextPopulationId}`, mutations: [], numberOfCells: 1 }]);
-								setNextPopulationId(nextPopulationId + 1);
+								addPopulation({ id: nextPopulationId, name: `Population${nextPopulationId}`, mutations: [], numberOfCells: 1 })
+								updateNextPopulationId()
 							}} autoContrast aria-label="Settings" radius={"xl"} color={colorsAddButton}>
 								<IconPlus style={{ width: '70%', height: '70%', color: colorsAddButtonIcon }} stroke={1.5} />
 							</ActionIcon>
@@ -48,14 +62,14 @@ export default function StartingConditions({ populations, mutations, functionalE
 											<Badge color={colorsPills} autoContrast size="lg">{mutation.name}</Badge>
 										</GridCol>
 										<GridCol span={8}>
-											<NativeSelect onChange={(e) => updateMutationEvent(mutation, Number(e.currentTarget.value))} data={functionalEvents.map(event => ({ label: event.name, value: String(event.id) }))} />
+											<NativeSelect onChange={(e) => updateMutations(mutation, Number(e.currentTarget.value))} data={functionalEvents.map(event => ({ label: event.name, value: String(event.id) }))} />
 										</GridCol>
 									</Grid>
 								)
 							})}
 							<ActionIcon onClick={() => {
-								setMutations([...mutations, { name: `Mut${nextMutationId}`, event: functionalEvents[0].id }]);
-								setNextMutationId(nextMutationId + 1);
+								addMutations({ name: `Mut${nextMutationId}`, event: functionalEvents[0].id })
+								updateNextMutationId()
 							}} autoContrast aria-label="Settings" radius={"xl"} color={colorsAddButton}>
 								<IconPlus style={{ width: '70%', height: '70%', color: colorsAddButtonIcon }} stroke={1.5} />
 							</ActionIcon>

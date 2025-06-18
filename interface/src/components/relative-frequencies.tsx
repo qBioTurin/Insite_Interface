@@ -1,12 +1,6 @@
-import { Badge, Button, Card, Center, NumberInput, ScrollArea, ScrollAreaAutosize, Text, TextInput } from "@mantine/core";
-import { colors, colorsPage } from "./colors";
-
-interface Event {
-	id: number;
-	name: string;
-	type: "growth" | "mutation" | "space" | "competition" | "passenger";
-	frequency: number;
-}
+import { Badge, Center, NumberInput, ScrollAreaAutosize } from "@mantine/core";
+import { colors } from "./colors";
+import { Event } from "./interfaces";
 
 export default function RelativeFrequencies({ events, updateEventFrequency }: { events: Event[]; updateEventFrequency: (eventToRename: Event, newFrequency: number) => void }) {
 

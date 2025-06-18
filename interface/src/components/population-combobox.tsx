@@ -3,8 +3,13 @@ import { CheckIcon, Combobox, ComboboxDropdownTarget, ComboboxEventsTarget, Grou
 import { useState } from "react";
 import { Mutation, Population } from "./interfaces";
 import { colorsPills } from "./colors";
+import { useStartingConditionsStore } from "@/lib/starting-conditions-store";
 
-export default function PopulationCombobox({ mutations, addMutationToPopulation, population }: { mutations: Mutation[], addMutationToPopulation: (population: Population, mutation: Mutation) => void, population: Population }) {
+export default function PopulationCombobox({ population }: { population: Population }) {
+	const {
+		addMutationToPopulation,
+		mutations
+	} = useStartingConditionsStore();
 	const [values, setValues] = useState<string[]>(population.mutations);
 
 	const combobox = useCombobox({
@@ -13,7 +18,7 @@ export default function PopulationCombobox({ mutations, addMutationToPopulation,
 	});
 
 	const handleValueSelect = (val: string) => {
-		addMutationToPopulation(population, mutations.filter((mut) => mut.name === val)[0])
+		addMutationToPopulation(population, mutations.filter((mut) => mut.name === val)[0].name)
 		setValues((current) =>
 			current.includes(val) ? current.filter((v) => v !== val) : [...current, val]
 		);
