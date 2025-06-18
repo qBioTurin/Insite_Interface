@@ -1,0 +1,14 @@
+services:
+  interface:
+    build:
+      context: interface
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - cancersimulation-network
+    ports:
+      - "3000:3000"
+
+networks:
+  cancersimulation-network:
+    driver: bridge
