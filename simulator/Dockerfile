@@ -1,23 +1,47 @@
-FROM r-base:latest
+FROM r-base:4.4.1
 
-# Install Python and pip
-RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
+RUN apt-get update
+RUN apt-get install gcc make libbz2-dev zlib1g-dev libncurses5-dev libncursesw5-dev liblzma-dev bzip2 g++ rsync libsqlite3-dev -y
+RUN apt-get install build-essential libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev -y
+COPY ./Python-3.11.2.tar.xz /tmp/Python-3.11.2.tar.xz
+RUN tar -xf /tmp/Python-3.11.2.tar.xz
 
-# Crea un virtualenv
-RUN python3 -m venv /opt/venv
+WORKDIR /Python-3.11.2
+RUN ./configure --enable-optimizations
+RUN make install
+RUN pip3 install flask
 
-# Attiva il virtualenv e installa Flask
-RUN /opt/venv/bin/pip install flask
+WORKDIR /
 
-# Imposta il PATH di default
-ENV PATH="/opt/venv/bin:$PATH"
+RUN apt-get update
+RUN apt-get install libxml2-dev libssl-dev libcurl4-openssl-dev libgit2-dev libfribidi-dev  libpng-dev libtiff5-dev libjpeg-dev libudunits2-dev cmake -y
+RUN apt-get install  libfreetype6-dev libharfbuzz-dev libfontconfig1-dev   -y 
 
-# Copia i file
+# RUN R -e "install.packages('glue')"
+# RUN R -e "install.packages('BiocManager')"
+# RUN R -e "install.packages('ggplot2')"
+# RUN R -e "BiocManager::install('phyloseq')"
+# RUN R -e "BiocManager::install('DESeq2')"
+# RUN R -e "BiocManager::install('microbiome')"
+# RUN R -e "install.packages('tidyverse')"
+# RUN R -e "install.packages('devtools')"
+# RUN R -e "devtools::install_github('microsud/microbiomeutilities')"
+
+# COPY Rscripts/Packages.R Rscripts/Packages.R
+
+# # RUN Rscript Rscripts/Packages.R
+
+# COPY Rscripts ./Rscripts
+
+# COPY app.py .
+
 WORKDIR /app
-COPY app/ .
+COPY app/scripts/install_libraries.R .
 
-# Espone la porta
-EXPOSE 5001
+RUN Rscript install_libraries.R
 
-# Esegui Flask con Python nel virtualenv
-CMD ["python", "main.py"]
+COPY app .
+
+EXPOSE 5000
+
+CMD ["python3", "main.py"]

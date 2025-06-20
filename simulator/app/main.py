@@ -17,12 +17,11 @@ def run_r_script():
         with open("/data/params.json", "w") as f:
             json.dump(param, f, indent=4)
 
-        # Esegui lo script R con un parametro
-        # result = subprocess.run(
-        #     ["Rscript", "script.R", param],
-        #     capture_output=True,
-        #     text=True
-        # )
+        result = subprocess.run(
+            ["Rscript", "/app/scripts/run_simulation.R"],
+            capture_output=True,
+            text=True
+        )
         return jsonify({
             "stdout": param,
         })
