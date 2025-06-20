@@ -23,3 +23,9 @@ export interface Population {
 	mutations: string[];
 	numberOfCells: number;
 }
+
+export interface TreeNode {
+	key: string;
+	data: string;
+	children?: TreeNode[]
+}

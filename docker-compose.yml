@@ -9,6 +9,16 @@ services:
     ports:
       - "3000:3000"
 
+  simulator:
+    build:
+      context: simulator
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - cancersimulation-network
+    ports:
+      - "5001:5001"
+
 networks:
   cancersimulation-network:
     driver: bridge

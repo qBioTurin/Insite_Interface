@@ -21,6 +21,7 @@ interface StartingConditions {
 	updateNextPopulationId: () => void;
 	updatePopulationNumberCells: (population: Population, newNumberCells: number) => void;
 	addMutationToPopulation: (population: Population, mutation: string) => void;
+	removeMutationFromPopulation: (population: Population, mutation: string) => void;
 }
 
 export const useStartingConditionsStore = create<StartingConditions>((set) => ({
@@ -29,7 +30,7 @@ export const useStartingConditionsStore = create<StartingConditions>((set) => ({
 	mutations: [{ name: "Mut1", event: 1 }],
 	nextMutationId: 2,
 
-	populations: [{ id: 1, name: "Population1", mutations: ["Mut1"], numberOfCells: 1 }],
+	populations: [{ id: 1, name: "Pop1", mutations: ["Mut1"], numberOfCells: 1 }],
 	nextPopulationId: 2,
 
 	setStartingNumberOfCells: (newStartingNumberOfCells) => set({ startingNumberOfCells: newStartingNumberOfCells }),
@@ -65,8 +66,14 @@ export const useStartingConditionsStore = create<StartingConditions>((set) => ({
 		})),
 	addMutationToPopulation: (population, mutation) =>
 		set((state) => ({
-			populations: state.populations.map((p) => 
-				population.id === p.id ? {...population, mutations: [...population.mutations, mutation]} : p
+			populations: state.populations.map((p) =>
+				population.id === p.id ? { ...population, mutations: [...population.mutations, mutation] } : p
+			)
+		})),
+	removeMutationFromPopulation: (population, mutation) =>
+		set((state) => ({
+			populations: state.populations.map((p) =>
+				population.id === p.id ? { ...population, mutations: population.mutations.filter(mut => mut !== mutation) } : p
 			)
 		}))
 }));

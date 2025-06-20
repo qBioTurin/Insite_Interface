@@ -8,6 +8,7 @@ import { useStartingConditionsStore } from "@/lib/starting-conditions-store";
 export default function PopulationCombobox({ population }: { population: Population }) {
 	const {
 		addMutationToPopulation,
+		removeMutationFromPopulation,
 		mutations
 	} = useStartingConditionsStore();
 	const [values, setValues] = useState<string[]>(population.mutations);
@@ -24,8 +25,10 @@ export default function PopulationCombobox({ population }: { population: Populat
 		);
 	}
 
-	const handleValueRemove = (val: string) =>
+	const handleValueRemove = (val: string) => {
+		removeMutationFromPopulation(population, mutations.filter((mut) => mut.name === val)[0].name)
 		setValues((current) => current.filter((v) => v !== val));
+	}
 
 	const options = mutations
 		.map((mutation) => mutation.name)

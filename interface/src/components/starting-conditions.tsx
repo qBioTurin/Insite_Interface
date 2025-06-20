@@ -5,27 +5,28 @@ import { IconPlus } from "@tabler/icons-react";
 import PopulationCombobox from "./population-combobox";
 import { useStartingConditionsStore } from "@/lib/starting-conditions-store";
 
-export default function StartingConditions({ functionalEvents }: { functionalEvents: Event[]}) {
+export default function StartingConditions({ functionalEvents }: { functionalEvents: Event[] }) {
 	const {
-			addMutations,
-			updateNextMutationId,
-			updateMutations,
-			updateNextPopulationId,
-			addPopulation,
-			updatePopulationNumberCells,
-			nextPopulationId,
-			populations,
-			nextMutationId,
-			mutations,
-			setStartingNumberOfCells,
-			startingNumberOfCells
-		} = useStartingConditionsStore();
+		addMutations,
+		updateNextMutationId,
+		updateMutations,
+		updateNextPopulationId,
+		addPopulation,
+		updatePopulationNumberCells,
+		nextPopulationId,
+		populations,
+		nextMutationId,
+		mutations,
+		setStartingNumberOfCells,
+		startingNumberOfCells
+	} = useStartingConditionsStore();
+
 	return (
 		<>
 			<h1>Starting Conditions</h1>
 			<NumberInput label="Starting number of cells" onChange={(val) => setStartingNumberOfCells(Number(val))} defaultValue={startingNumberOfCells} hideControls w={"40%"} />
 			<Grid mt={40}>
-				<GridCol span={8}>
+				<GridCol span={7}>
 					<Fieldset legend="Starting Populations">
 						<Stack>
 							{populations.map((population, index) => {
@@ -44,7 +45,7 @@ export default function StartingConditions({ functionalEvents }: { functionalEve
 								)
 							})}
 							<ActionIcon onClick={() => {
-								addPopulation({ id: nextPopulationId, name: `Population${nextPopulationId}`, mutations: [], numberOfCells: 1 })
+								addPopulation({ id: nextPopulationId, name: `Pop${nextPopulationId}`, mutations: [], numberOfCells: 1 })
 								updateNextPopulationId()
 							}} autoContrast aria-label="Settings" radius={"xl"} color={colorsAddButton}>
 								<IconPlus style={{ width: '70%', height: '70%', color: colorsAddButtonIcon }} stroke={1.5} />
@@ -52,7 +53,7 @@ export default function StartingConditions({ functionalEvents }: { functionalEve
 						</Stack>
 					</Fieldset>
 				</GridCol>
-				<GridCol span={4}>
+				<GridCol span={5}>
 					<Fieldset legend="Mutations Phenotypes">
 						<Stack>
 							{mutations.map((mutation, index) => {
