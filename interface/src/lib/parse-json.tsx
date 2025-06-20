@@ -83,7 +83,8 @@ function generateTree(sets: Set<string>[]): TreeNode[] {
 
 function renameTreeNodes(nodes: TreeNode[], prefix: string = ''): TreeNode[] {
 	return nodes.map((node, index) => {
-		const currentId = prefix ? `${prefix}_${index + 1}` : `${index + 1}`;
+		// const currentId = prefix ? `${prefix}_${index + 1}` : `${index + 1}`;
+		const currentId = `${index + 1}`
 		return {
 			key: node.key,
 			data: currentId,

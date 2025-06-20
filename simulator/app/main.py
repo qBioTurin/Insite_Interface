@@ -1,12 +1,21 @@
 from flask import Flask, request, jsonify
 import subprocess
+import json
+import os
 
 app = Flask(__name__)
+
 
 @app.route("/run-r", methods=["POST"])
 def run_r_script():
     try:
         param = request.json
+
+        os.makedirs("/data", exist_ok=True)
+
+        # Salva i parametri come file JSON
+        with open("/data/params.json", "w") as f:
+            json.dump(param, f, indent=4)
 
         # Esegui lo script R con un parametro
         # result = subprocess.run(
@@ -22,4 +31,4 @@ def run_r_script():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=5000)

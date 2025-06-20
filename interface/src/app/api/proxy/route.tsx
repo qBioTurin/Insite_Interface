@@ -4,7 +4,7 @@ export async function POST(req: Request) {
 	const body = await req.json();
 
 
-	const apiRes = await fetch('http://simulator:5001/run-r', {
+	const apiRes = await fetch('http://simulator:5000/run-r', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',

@@ -16,8 +16,8 @@ services:
     restart: unless-stopped
     networks:
       - cancersimulation-network
-    ports:
-      - "5001:5001"
+    volumes:
+      - './simulator/data:/data'
 
 networks:
   cancersimulation-network:
