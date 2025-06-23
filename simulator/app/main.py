@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, send_file, jsonify
 import subprocess
 import json
 import os
@@ -22,11 +22,29 @@ def run_r_script():
             capture_output=True,
             text=True
         )
+        subprocess.run(
+            ["Rscript", "/app/scripts/draw_plot.R"],
+            capture_output=True,
+            text=True
+        )
         return jsonify({
             "stdout": param,
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route("/download_image", methods=["GET"])
+def download_file():
+    file_path = os.path.join(
+        "/data",
+        "plot.png"
+    )
+    print(f"Open file: {file_path}")
+    
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True)
+    else:
+        return {"error": "File not found"}, 404
 
 
 if __name__ == "__main__":

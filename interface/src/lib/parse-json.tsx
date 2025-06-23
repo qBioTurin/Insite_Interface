@@ -96,7 +96,6 @@ function renameTreeNodes(nodes: TreeNode[], prefix: string = ''): TreeNode[] {
 function findDataByKey(nodes: TreeNode[], key: string): string | undefined {
 	for (const node of nodes) {
 		if (node.key === key) {
-			console.log(node.key)
 			return node.data;
 		}
 		if (node.children) {
@@ -131,18 +130,18 @@ export function parseJson() {
 
 	const tree = renameTreeNodes(generateTree((populations.map(p => new Set(p.mutations)))))
 
-	const genotype: any[] = []
+	const genotype: number[][] = []
 	const phenotype: any[] = []
 	const numCells: number[] = []
 
 	populations.filter(p => p.mutations.length > 0).map((p) => {
-		genotype.push(p.mutations.map(m => findDataByKey(tree, m)))
+		genotype.push(p.mutations.map(m => Number(findDataByKey(tree, m))))
 		phenotype.push(p.mutations.map(m => mutations.filter(m1 => m1.name === m)[0].event))
 		numCells.push(p.numberOfCells)
 	})
 
 	const jsonObject = {
-		cellLifeDays,
+		cellLife: cellLifeDays,
 		carryingCapacity,
 		mutationRate,
 		mutableBases,

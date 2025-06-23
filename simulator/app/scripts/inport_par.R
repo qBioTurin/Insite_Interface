@@ -1,6 +1,6 @@
-source("install_libraries.R")
-source("libraries.R")
-source("Utils.R")
+source("/app/scripts/install_libraries.R")
+source("/app/scripts/libraries.R")
+source("/app/scripts/Utils.R")
 
 # args<-commandArgs(trailingOnly = TRUE)
 # json_data <- fromJSON(file=args(1))

@@ -1,10 +1,10 @@
-source("libraries.R")
-source("inport_par.R")
-source("Utils.R")
-source("Population.R")
-source("Local_Params.R")
-source("Population_with_size_nmut.R")
-source("Simulazioni_fenotipo_classi.R")
+source("/app/scripts/libraries.R")
+source("/app/scripts/inport_par.R")
+source("/app/scripts/Utils.R")
+source("/app/scripts/Population.R")
+source("/app/scripts/Local_Params.R")
+source("/app/scripts/Population_with_size_nmut.R")
+source("/app/scripts/Simulazioni_fenotipo_classi.R")
 
 
 
