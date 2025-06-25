@@ -11,7 +11,7 @@ if(interactive()){
 path_in<-args[1]
 path_out<-args[4]
 json_palette_file<-args[3]
-freq<-args[2]
+freq<-as.logical(args[2])
 
 load(paste(path_in,"/obs_tumor.RData",sep=""))
 load(paste(path_in,"/Parameters.RData",sep=""))
@@ -19,9 +19,24 @@ json_palette<-fromJSON(file=json_palette_file)
 palette<-sapply(json_palette,function(el){el$color})
 names(palette)<-sapply(json_palette,function(el){el$label})
 
-plot_show<-get_muller_plot_show(obs_Pop_ID = obs_tumor$obs_Pop_ID,obs_tumor_tibble = obs_tumor$obs_tumor_tibble,freq = freq,palette = palette)
-  
-ggsave(plot,device = "png",
+plot_show<-get_muller_plot_show(obs_Pop_ID = obs_tumor$obs_Pop_ID,
+                                obs_tumor_tibble = obs_tumor$obs_tumor_tibble,
+                                freq = freq,
+                                palette = palette,
+                                functional_effects = parameters@functional_effects)
+
+ggsave(plot_show,device = "png",
        path = path_out,
        width = 9,height = 5,
-       filename="plot.png")
+       filename="plot_show.png")
+
+plot_download<-get_muller_plot_download(obs_Pop_ID = obs_tumor$obs_Pop_ID,
+                                obs_tumor_tibble = obs_tumor$obs_tumor_tibble,
+                                freq = freq,
+                                palette = palette,
+                                functional_effects = parameters@functional_effects)
+
+ggsave(plot_download,device = "pdf",
+       path = path_out,
+       width = 9,height = 5,
+       filename="plot_download.pdf")

@@ -1007,7 +1007,7 @@ setMethod("get_muller_plot_download",
                   xlab("Days")+
                   ylab("Absolute Aboundance")+
                   scale_x_continuous(breaks=round(seq(min(Clones_df$time),max(Clones_df$time),length.out=5)))+
-                  guides(fill=guide_legend(title="Functional effect:",override.aes = list(color = palette_dark)))+
+                  guides(fill=guide_legend(title="Phenotype:",override.aes = list(color = palette_dark)))+
                   theme_void()+
                   theme(
                     axis.title.x = element_text(size=14),
@@ -1132,7 +1132,7 @@ setMethod("get_muller_plot_download",
                          scale_color_manual(values=palette_dark,guide = "none")+
                          labs(x ="Days",
                               y="Relative Aboundance")+
-                         guides(fill=guide_legend(title="Functional effect:",override.aes = list(color = palette_dark)))+
+                         guides(fill=guide_legend(title="Phenotype:",override.aes = list(color = palette_dark)))+
                          theme(
                            axis.title.x = element_text(size=14),
                            axis.title.y = element_text(size=14,angle=90,vjust = 2.5),
