@@ -6,9 +6,11 @@ source("scripts/Population_with_size_nmut.R")
 
 args<-commandArgs(trailingOnly = TRUE)
 if(interactive()){
-  args <- c("raw")
+  args <- c("raw",4,"functional_effect","output")
 }
 path<-args[1]
+depth<-10^{-as.numeric(args[2])}
+color_by<-args[3]
 
 load(paste(path,"/Parameters.RData",sep=""))
 Nexp<-1
@@ -29,22 +31,46 @@ obs_pop<-unique(unlist(sapply(tumor,
                               function(tum_time_fix){
                                 Ncells_time_fix<-sapply(tum_time_fix, Ncells)
                                 Fcells_time_fix<-Ncells_time_fix/sum(Ncells_time_fix)
-                                tum_time_fix_filt<-tum_time_fix[Fcells_time_fix>10^(-3)]
+                                tum_time_fix_filt<-tum_time_fix[Fcells_time_fix>depth]
                                 obs_pop<-lapply(tum_time_fix_filt,Population)
                                 return(obs_pop)
                               })))
 
-fun_eff_labels<-sapply(obs_pop,
-                       function(pop){
-                         paste(names(parameters@functional_effects[phenotype(pop)]),collapse = "_")
-                       })
+if(color_by=="functional_effect"){
+  fun_eff_labels<-unique(sapply(obs_pop,
+                                function(pop){
+                                  paste(
+                                    names(
+                                      parameters@functional_effects[
+                                        sort(
+                                          phenotype(pop)
+                                          )
+                                        ]
+                                      ),
+                                    collapse = ", ")
+                                  }
+                                )
+                         )
 
-json_data <- lapply(fun_eff_labels, function(fun_eff_label) {
-  list(label = fun_eff_label, color = "")
-})
+  json_data <- lapply(fun_eff_labels,
+                      function(fun_eff_label) {
+                        list(label = fun_eff_label, color = "")
+                        }
+                      )
+}else{
+  gen_labels<-sapply(obs_pop,
+                     function(pop){
+                       paste(
+                         "Mut",
+                         pop@genotype,
+                         sep="",
+                         collapse = ", ")
+                     }
+  )
+}
 write(toJSON(
   json_data
-),"label_color.json")
+),paste(path,"/label_color.json",sep=""))
 
 obs_pop_id<-tibble(Population_ID=1:length(obs_pop),Populations=obs_pop)
 

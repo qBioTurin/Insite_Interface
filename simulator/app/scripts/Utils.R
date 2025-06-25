@@ -540,7 +540,7 @@ setMethod("get_muller_plot_show",
               n_sons<-tibble(Population_ID=obs_Pop_ID$Population_ID,n=lengths(daughters))
               
               fun_eff<-sapply(pop,function(p){
-                paste(names(functional_effects[p@phenotype]),collapse = "_")
+                paste(names(functional_effects[sort(p@phenotype)]),collapse = ", ")
                 })
               
               palette<-palette[sort(unique(fun_eff))]
@@ -854,7 +854,7 @@ setMethod("get_muller_plot_download",
               n_sons<-tibble(Population_ID=obs_Pop_ID$Population_ID,n=lengths(daughters))
               
               fun_eff<-sapply(pop,function(p){
-                paste(names(functional_effects[p@phenotype]),collapse = "_")
+                paste(names(functional_effects[sort(p@phenotype)]),collapse = ", ")
               })
               
               palette<-palette[sort(unique(fun_eff))]
