@@ -581,13 +581,13 @@ setMethod("get_muller_plot_show",
                     obs_tumor_tibble%>%
                       filter(Population_ID%in%root)%>%
                       group_by(time)%>%
-                      summarize(clone="0",
+                      summarize(clone=0,
                               Ncells_clone=sum(Ncells),
                               fun_eff=NA),
                     obs_tumor_tibble_clones)
-                  pop_with_sons<-c("0",n_sons$Population_ID[n_sons$n>0])
+                  pop_with_sons<-c(0,n_sons$Population_ID[n_sons$n>0])
                   daughters_ordered<-append(list(root),daughters_ordered)
-                  daughters_ordered_tbl<-bind_rows(tibble(Population_ID="0",
+                  daughters_ordered_tbl<-bind_rows(tibble(Population_ID=0,
                               daughters=list(root)),daughters_ordered_tbl)
                   root<-0
                 }
@@ -646,7 +646,7 @@ setMethod("get_muller_plot_show",
                   }
                 }
                 Clones_df<-Clones_df%>%
-                  filter(clone!="0")
+                  filter(clone!=0)
                 
                 trasl<-min(Clones_df$y_lower)
                 Clones_df$y_lower<-Clones_df$y_lower-trasl
@@ -669,7 +669,7 @@ setMethod("get_muller_plot_show",
                   theme(
                     legend.position ="none",
                     panel.margin = unit(0,"null"),
-                    plot.margin = rep(unit(0,"null"),4),
+                    plot.margin =  unit(rep(-1.25,4),"lines"),
                     axis.ticks.length = unit(0,"cm"),
                     axis.ticks.margin = unit(0,"cm")
                   )
@@ -700,14 +700,14 @@ setMethod("get_muller_plot_show",
                 
                 if(length(root)>1){
                   obs_tumor_tibble_clones<-bind_rows(
-                    tibble(clone="0",
+                    tibble(clone=0,
                            time=unique(obs_tumor_tibble_clones$time),
                            Fcells_clone=1,
                            fun_eff="competition"),
                     obs_tumor_tibble_clones)
-                  pop_with_sons<-c("0",n_sons$Population_ID[n_sons$n>0])
+                  pop_with_sons<-c(0,n_sons$Population_ID[n_sons$n>0])
                   daughters_ordered<-append(list(root),daughters_ordered)
-                  daughters_ordered_tbl<-bind_rows(tibble(Population_ID="0",
+                  daughters_ordered_tbl<-bind_rows(tibble(Population_ID=0,
                                                           daughters=list(root)),daughters_ordered_tbl)
                   root<-0
                 }
@@ -763,7 +763,7 @@ setMethod("get_muller_plot_show",
                 }
                 
                 Clones_df<-Clones_df%>%
-                  filter(clone!="0")
+                  filter(clone!=0)
                 Clones_df$y_lower_frac<-Clones_df$y_lower_frac+0.5
                 Clones_df$y_upper_frac<-Clones_df$y_upper_frac+0.5
                 Clones_df$clone<-factor(Clones_df$clone,levels=Pop_ID)
@@ -789,7 +789,7 @@ setMethod("get_muller_plot_show",
                   theme(
                     legend.position ="none",
                     panel.margin = unit(0,"null"),
-                    plot.margin = rep(unit(0,"null"),4),
+                    plot.margin =  unit(rep(-1.25,4),"lines"),
                     axis.ticks.length = unit(0,"cm"),
                     axis.ticks.margin = unit(0,"cm")
                   )
@@ -895,13 +895,13 @@ setMethod("get_muller_plot_download",
                     obs_tumor_tibble%>%
                       filter(Population_ID%in%root)%>%
                       group_by(time)%>%
-                      summarize(clone="0",
+                      summarize(clone=0,
                                 Ncells_clone=sum(Ncells),
                                 fun_eff=NA),
                     obs_tumor_tibble_clones)
-                  pop_with_sons<-c("0",n_sons$Population_ID[n_sons$n>0])
+                  pop_with_sons<-c(0,n_sons$Population_ID[n_sons$n>0])
                   daughters_ordered<-append(list(root),daughters_ordered)
-                  daughters_ordered_tbl<-bind_rows(tibble(Population_ID="0",
+                  daughters_ordered_tbl<-bind_rows(tibble(Population_ID=0,
                                                           daughters=list(root)),daughters_ordered_tbl)
                   root<-0
                 }
@@ -960,7 +960,7 @@ setMethod("get_muller_plot_download",
                   }
                 }
                 Clones_df<-Clones_df%>%
-                  filter(clone!="0")
+                  filter(clone!=0)
                 
                 trasl<-min(Clones_df$y_lower)
                 Clones_df$y_lower<-Clones_df$y_lower-trasl
@@ -1045,14 +1045,14 @@ setMethod("get_muller_plot_download",
                 
                 if(length(root)>1){
                   obs_tumor_tibble_clones<-bind_rows(
-                    tibble(clone="0",
+                    tibble(clone=0,
                            time=unique(obs_tumor_tibble_clones$time),
                            Fcells_clone=1,
                            fun_eff="competition"),
                     obs_tumor_tibble_clones)
-                  pop_with_sons<-c("0",n_sons$Population_ID[n_sons$n>0])
+                  pop_with_sons<-c(0,n_sons$Population_ID[n_sons$n>0])
                   daughters_ordered<-append(list(root),daughters_ordered)
-                  daughters_ordered_tbl<-bind_rows(tibble(Population_ID="0",
+                  daughters_ordered_tbl<-bind_rows(tibble(Population_ID=0,
                                                           daughters=list(root)),daughters_ordered_tbl)
                   root<-0
                 }
@@ -1108,7 +1108,7 @@ setMethod("get_muller_plot_download",
                 }
                 
                 Clones_df<-Clones_df%>%
-                  filter(clone!="0")
+                  filter(clone!=0)
                 Clones_df$y_lower_frac<-Clones_df$y_lower_frac+0.5
                 Clones_df$y_upper_frac<-Clones_df$y_upper_frac+0.5
                 Clones_df$clone<-factor(Clones_df$clone,levels=Pop_ID)

@@ -6,11 +6,11 @@ source("scripts/Population_with_size_nmut.R")
 
 args<-commandArgs(trailingOnly = TRUE)
 if(interactive()){
-  args <- c("raw",FALSE,"label_color.json","output")
+  args <- c("raw",FALSE,"labeled_colors.json","output")
 }
 path_in<-args[1]
 path_out<-args[4]
-json_palette_file<-args[3]
+json_palette_file<-paste(path_in,args[3],sep="/")
 freq<-as.logical(args[2])
 
 load(paste(path_in,"/obs_tumor.RData",sep=""))
