@@ -9,4 +9,5 @@ data/
 *.Rproj
 app/params.json
 app/raw
-App/output
+app/output
+app/label_color.json

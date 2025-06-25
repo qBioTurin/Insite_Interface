@@ -6,11 +6,10 @@ source("scripts/Population_with_size_nmut.R")
 
 args<-commandArgs(trailingOnly = TRUE)
 if(interactive()){
-  args <- c("raw",4,"functional_effect","output")
+  args <- c("raw",4)
 }
 path<-args[1]
 depth<-10^{-as.numeric(args[2])}
-color_by<-args[3]
 
 load(paste(path,"/Parameters.RData",sep=""))
 Nexp<-1
@@ -36,8 +35,8 @@ obs_pop<-unique(unlist(sapply(tumor,
                                 return(obs_pop)
                               })))
 
-if(color_by=="functional_effect"){
-  fun_eff_labels<-unique(sapply(obs_pop,
+
+fun_eff_labels<-unique(sapply(obs_pop,
                                 function(pop){
                                   paste(
                                     names(
@@ -52,22 +51,12 @@ if(color_by=="functional_effect"){
                                 )
                          )
 
-  json_data <- lapply(fun_eff_labels,
+json_data <- lapply(fun_eff_labels,
                       function(fun_eff_label) {
                         list(label = fun_eff_label, color = "")
                         }
                       )
-}else{
-  gen_labels<-sapply(obs_pop,
-                     function(pop){
-                       paste(
-                         "Mut",
-                         pop@genotype,
-                         sep="",
-                         collapse = ", ")
-                     }
-  )
-}
+
 write(toJSON(
   json_data
 ),paste(path,"/label_color.json",sep=""))
