@@ -38,8 +38,12 @@ fun_eff_labels<-sapply(obs_pop,
                        function(pop){
                          paste(names(parameters@functional_effects[phenotype(pop)]),collapse = "_")
                        })
+
+json_data <- lapply(fun_eff_labels, function(fun_eff_label) {
+  list(label = fun_eff_label, color = "")
+})
 write(toJSON(
-  as.list(fun_eff_labels)
+  json_data
 ),"label_color.json")
 
 obs_pop_id<-tibble(Population_ID=1:length(obs_pop),Populations=obs_pop)
