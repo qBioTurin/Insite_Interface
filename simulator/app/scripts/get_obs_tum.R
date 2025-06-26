@@ -36,30 +36,7 @@ obs_pop<-unique(unlist(sapply(tumor,
                               })))
 
 
-fun_eff_labels<-unique(sapply(obs_pop,
-                                function(pop){
-                                  paste(
-                                    names(
-                                      parameters@functional_effects[
-                                        sort(
-                                          phenotype(pop)
-                                          )
-                                        ]
-                                      ),
-                                    collapse = ", ")
-                                  }
-                                )
-                         )
 
-json_data <- lapply(fun_eff_labels,
-                      function(fun_eff_label) {
-                        list(label = fun_eff_label, color = "")
-                        }
-                      )
-
-write(toJSON(
-  json_data
-),paste(path,"/label_color.json",sep=""))
 
 obs_pop_id<-tibble(Population_ID=1:length(obs_pop),Populations=obs_pop)
 
@@ -93,4 +70,34 @@ obs_tumor$obs_Pop_ID<-obs_pop_id
 
 save(obs_tumor,file = paste(path,"/obs_tumor.RData",sep=""))
 
+obs_pop_ordered<-obs_tumor_tibble%>%
+  group_by(Population_ID)%>%
+  summarise(max_ncells=max(Ncells))%>%
+  merge(obs_pop_id)%>%
+  arrange(desc(max_ncells))%>%
+  pull(Populations)
 
+fun_eff_labels<-unique(sapply(obs_pop_ordered,
+                              function(pop){
+                                paste(
+                                  names(
+                                    parameters@functional_effects[
+                                      sort(
+                                        phenotype(pop)
+                                      )
+                                    ]
+                                  ),
+                                  collapse = ", ")
+                              }
+)
+)
+
+json_data <- lapply(fun_eff_labels,
+                    function(fun_eff_label) {
+                      list(label = fun_eff_label, color = "")
+                    }
+)
+
+write(toJSON(
+  json_data
+),paste(path,"/label_color.json",sep=""))

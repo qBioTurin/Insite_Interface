@@ -33,13 +33,13 @@ unique_mut_id<-lapply(gen,function(g){
 })
 nmut_in_gen<-lengths(gen)
 
-starting_muts<-sapply(starting_gen, function(g){
-  starting_mut<-vector()
-  for(i in 1:length(g)){
-    starting_mut<-c(starting_mut,paste(g[1:i],collapse="_"))
-  }
-  return(starting_mut)
-})%>%unlist()%>%unique()
+# starting_muts<-sapply(starting_gen, function(g){
+#   starting_mut<-vector()
+#   for(i in 1:length(g)){
+#     starting_mut<-c(starting_mut,paste(g[1:i],collapse="_"))
+#   }
+#   return(starting_mut)
+# })%>%unlist()%>%unique()
 
 parent<-lapply(unique_mut_id,lag)
 mut_generation<-sapply(gen, function(g){1:length(g)})
@@ -50,6 +50,8 @@ composition<-tibble(mut=unique_mut_id,parent,fun_eff,ncells,mut_generation)%>%
             frequency=ncells/tot_ncells)%>%
   ungroup()%>%
   arrange(desc(frequency))
+
+
 
 sampled_ncells<-as.vector(rmultinom(1,round(tot_ncells/100),ncells/tot_ncells))
 tot_sampled_cells<-sum(sampled_ncells)
@@ -63,7 +65,7 @@ pcr<-function(ncells_start,ncycles){
   return(ncells)
 }
 
-vcf_sample<-tibble(gen,fun_eff,id_pop=1:length(gen),mut=unique_mut_id,sampled_ncells)%>%
+sampled_cells_info<-tibble(gen,fun_eff,id_pop=1:length(gen),mut=unique_mut_id,sampled_ncells)%>%
   filter(sampled_ncells>0)%>%
   rowwise()%>%
   mutate(ncells_post_PCR=pcr(sampled_ncells,10))%>%
@@ -78,10 +80,11 @@ vcf_sample<-tibble(gen,fun_eff,id_pop=1:length(gen),mut=unique_mut_id,sampled_nc
 
 load("dens.RData")
 
-sample_DP<-round(sample(x = dens$x, nrow(vcf_sample), prob = dens$y, replace=TRUE) + rnorm(1, 0, dens$bw))
+
+sample_DP<-round(sample(x = dens_coverage$x, nrow(sampled_cells_info), prob = dens_coverage$y, replace=TRUE) + rnorm(1, 0, dens_coverage$bw))
 sample_DP[sample_DP<0]<-0
-sample_AD<-mapply(rbinom,prob=vcf_sample$prob,size=sample_DP,MoreArgs = list(n=1))
-vcf_sample<-vcf_sample%>%
+sample_AD<-mapply(rbinom,prob=sampled_cells_info$prob,size=sample_DP,MoreArgs = list(n=1))
+vcf_sample<-sampled_cells_info%>%
   bind_cols(sample_DP=sample_DP,sample_AD=sample_AD)%>%
   filter(sample_AD>0)%>%
   mutate(VAF=sample_AD/sample_DP)%>%
@@ -99,12 +102,12 @@ names(palette_new)<-names(parameters@functional_effects)
 fun_eff_last<-sapply(
   fun_eff,
   function(f){
-    return(palette_new[f[length(f)]])
+    return(f[length(f)])
   }
 )
 longest_gene<-max(lengths(gen))
 gen_complete<-lapply(gen, function(g){
-  g_complete<-c(g,rep(NA,longest_gene-length(g)))
+  g_complete<-c(g,rep("",longest_gene-length(g)))
   names(g_complete)<-paste("level",1:longest_gene,sep="_")
   return(g_complete)
   })
@@ -115,3 +118,22 @@ collapsibleTree(as.data.frame(df),
                 fontSize=0,collapsed = FALSE,
                 nodeSize="ncells",root="tumor",
                 fill=c("",fun_eff_last))
+
+
+prova<-tibble(mut=unique_mut_id,sampled_ncells)%>%filter(sampled_ncells>0)
+cells<-unlist(mapply(function(g,n){
+  return(rep(list(g),n))
+},prova$mut,prova$sampled_ncells,SIMPLIFY = TRUE),recursive = FALSE)
+
+prova<-tibble(cells)%>%
+  mutate(id=row_number())%>%
+  unnest(cells)%>%
+  pivot_wider(names_from = cells,values_from = cells,values_fn = as.numeric,values_fill = 0)
+
+heatmap(as.matrix(prova[,-1]))
+prova<-tibble(mut=unique_mut_id,ncells)%>%
+  mutate(id=row_number())%>%
+  unnest(mut)%>%
+  pivot_wider(names_from = mut,values_from = ncells)
+ggplot()+
+  geom_tile()
