@@ -1188,7 +1188,7 @@ setMethod("get_side_plot_show",
                   geom_label(aes(x=0,
                                  y=1/2),
                              label = TeX(latex_label_k),
-                             size=3,
+                             size=3,fill = "#f3f3f3",
                              label.size = NA)+
                   theme_void()
                 return(p)
