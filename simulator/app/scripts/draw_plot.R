@@ -32,6 +32,7 @@ ggsave(plot_show_absolute,device = "png",
 
 side_plot_show<-get_side_plot_show(obs_tumor$obs_tumor_tibble)+
   theme(plot.margin =  unit(c(-17.5,-33,-17.5,-33), "pt"))
+
 ggsave(side_plot_show,device = "png",
        path = path_out,
        width = 1,height = 5,
