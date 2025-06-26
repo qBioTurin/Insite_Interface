@@ -30,11 +30,12 @@ ggsave(plot_show_absolute,device = "png",
        width = 9,height = 5,
        filename="plot_show_absolute.png")
 
-max_size_reached<-max(obs_tumor_tibble%>%group_by(time)%>%summarise(Ncells=sum(Ncells)))
+max_size_reached<-max(obs_tumor$obs_tumor_tibble%>%group_by(time)%>%summarise(Ncells=sum(Ncells)))
 little_label_k<-scales::scientific(max_size_reached, digits = 1)
 little_label_k<-str_split(little_label_k,"e",simplify = TRUE)
 little_label_k<-as.numeric(little_label_k)
 names(little_label_k)<-c("base","exponent")
+
 write(toJSON(little_label_k),file = paste(path_in,"little_label_k.json",sep="/"))
 
 
@@ -70,3 +71,4 @@ ggsave(plot_download_relative,device = "pdf",
        path = path_out,
        width = 9,height = 5,
        filename="plot_download_relative.pdf")
+
