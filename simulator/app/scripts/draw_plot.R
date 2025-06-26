@@ -31,11 +31,11 @@ ggsave(plot_show_absolute,device = "png",
        filename="plot_show_absolute.png")
 
 side_plot_show<-get_side_plot_show(obs_tumor$obs_tumor_tibble)+
-  theme(plot.margin =  unit(c(-17.5,-33,-17.5,-33), "pt"))
+  theme(plot.margin =  unit(c(-17.5,0,-17.5,0), "pt"))
 
 ggsave(side_plot_show,device = "png",
        path = path_out,
-       width = 1,height = 5,
+       width = 0.4,height = 5,
        filename="side_plot_show.png")
 
 plot_show_relative<-get_muller_plot_show(obs_Pop_ID = obs_tumor$obs_Pop_ID,
