@@ -30,13 +30,13 @@ ggsave(plot_show_absolute,device = "png",
        width = 9,height = 5,
        filename="plot_show_absolute.png")
 
-side_plot_show<-get_side_plot_show(obs_tumor$obs_tumor_tibble)+
-  theme(plot.margin =  unit(c(-17.5,0,-17.5,0), "pt"))
+max_size_reached<-max(obs_tumor_tibble%>%group_by(time)%>%summarise(Ncells=sum(Ncells)))
+little_label_k<-scales::scientific(max_size_reached, digits = 1)
+little_label_k<-str_split(little_label_k,"e",simplify = TRUE)
+little_label_k<-as.numeric(little_label_k)
+names(little_label_k)<-c("base","exponent")
+write(toJSON(little_label_k),file = paste(path_in,"little_label_k.json",sep="/"))
 
-ggsave(side_plot_show,device = "png",
-       path = path_out,
-       width = 0.4,height = 5,
-       filename="side_plot_show.png")
 
 plot_show_relative<-get_muller_plot_show(obs_Pop_ID = obs_tumor$obs_Pop_ID,
                                          obs_tumor_tibble = obs_tumor$obs_tumor_tibble,
