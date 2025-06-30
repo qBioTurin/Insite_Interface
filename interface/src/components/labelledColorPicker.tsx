@@ -8,12 +8,12 @@ export default function LabelledColorPicker({ label, c }: { label: string, c: st
 	const [opened, setOpened] = useState(false);
 	const [color, setColor] = useState(c);
 
-	const { updateColorByLabel, updateChangeColor, changeColor, changingColor } = useColorsLegendStore()
+	const { updateColorByLabel, updateChangeColor, changingColor } = useColorsLegendStore()
 
 	return (
 		<>
 			<Group>
-				<Popover opened={opened} onChange={setOpened} position="bottom" withArrow shadow="md">
+				<Popover opened={opened} onChange={setOpened} position="bottom" withArrow shadow="md" disabled={changingColor}>
 					<PopoverTarget>
 						<Box
 							w={32}
@@ -23,15 +23,14 @@ export default function LabelledColorPicker({ label, c }: { label: string, c: st
 							onClick={() => setOpened((o) => !o)}
 						/>
 					</PopoverTarget>
-					{!changingColor &&
-						<PopoverDropdown>
-							<ColorPicker value={color} swatchesPerRow={10} onChange={(e) => {
-								setColor(e)
-								updateColorByLabel(label, e)
-								updateChangeColor()
-							}} swatches={colorsPicker} />
-						</PopoverDropdown>
-					}
+					<PopoverDropdown>
+						<ColorPicker value={color} swatchesPerRow={10} onChange={(e) => {
+							setColor(e)
+							updateColorByLabel(label, e)
+							updateChangeColor()
+							setOpened(false)
+						}} swatches={colorsPicker} />
+					</PopoverDropdown>
 				</Popover>
 				<Text>{label}</Text>
 			</Group>

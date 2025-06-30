@@ -8,7 +8,8 @@ export const colors = {
 
 export const colorsPage = {
 	background: "#f3f3f3",
-	header: "#232b2b"
+	header: "#232b2b",
+	lightDescription: "#afabab"
 }
 
 export const colorsPicker = [

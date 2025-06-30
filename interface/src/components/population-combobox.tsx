@@ -11,7 +11,7 @@ export default function PopulationCombobox({ population }: { population: Populat
 		removeMutationFromPopulation,
 		mutations
 	} = useStartingConditionsStore();
-	const [values, setValues] = useState<string[]>(population.mutations);
+	// const [values, setValues] = useState<string[]>(population.mutations);
 
 	const combobox = useCombobox({
 		onDropdownClose: () => combobox.resetSelectedOption(),
@@ -20,29 +20,29 @@ export default function PopulationCombobox({ population }: { population: Populat
 
 	const handleValueSelect = (val: string) => {
 		addMutationToPopulation(population, mutations.filter((mut) => mut.name === val)[0].name)
-		setValues((current) =>
-			current.includes(val) ? current.filter((v) => v !== val) : [...current, val]
-		);
+		// setValues((current) =>
+		// 	current.includes(val) ? current.filter((v) => v !== val) : [...current, val]
+		// );
 	}
 
 	const handleValueRemove = (val: string) => {
 		removeMutationFromPopulation(population, mutations.filter((mut) => mut.name === val)[0].name)
-		setValues((current) => current.filter((v) => v !== val));
+		// setValues((current) => current.filter((v) => v !== val));
 	}
 
 	const options = mutations
 		.map((mutation) => mutation.name)
-		.filter((item) => !values.includes(item))
+		.filter((item) => !population.mutations.includes(item))
 		.map((item) => (
-			<Combobox.Option value={item} key={item} active={values.includes(item)}>
+			<Combobox.Option value={item} key={item} active={population.mutations.includes(item)}>
 				<Group gap="sm">
-					{values.includes(item) ? <CheckIcon size={12} /> : null}
+					{population.mutations.includes(item) ? <CheckIcon size={12} /> : null}
 					<Pill style={{ backgroundColor: colorsPills }}>{item}</Pill>
 				</Group>
 			</Combobox.Option>
 		));
 
-	const pills = values.map((item) => (
+	const pills = population.mutations.map((item) => (
 		<Pill key={item} style={{ backgroundColor: colorsPills }} withRemoveButton onRemove={() => handleValueRemove(item)}>
 			{item}
 		</Pill>
@@ -61,7 +61,7 @@ export default function PopulationCombobox({ population }: { population: Populat
 								onKeyDown={(event) => {
 									if (event.key === 'Backspace') {
 										event.preventDefault();
-										handleValueRemove(values[values.length - 1]);
+										handleValueRemove(population.mutations[population.mutations.length - 1]);
 									}
 								}}
 							/>

@@ -5,7 +5,7 @@ import GeneralInformation from "@/components/general-information";
 import { parseJson } from "@/lib/parse-json";
 import Image from 'next/image';
 
-import { Box, Button, ButtonGroup, Container, Divider, Grid, GridCol, Group, LoadingOverlay, SegmentedControl, Slider, Stack, Text } from "@mantine/core";
+import { Box, Button, ButtonGroup, Container, Divider, Grid, GridCol, Group, LoadingOverlay, SegmentedControl, Notification, Slider, Stack, Text, Progress } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 import { IconChevronDown, IconChevronUp, IconMinus, IconPlayerPlayFilled, IconPlus } from "@tabler/icons-react";
 import { colorsAddButtonIcon, colorsPage, colorsPicker, colorsRunButton } from "@/components/colors";
@@ -14,6 +14,7 @@ import parseColors from "@/lib/parse-colors";
 import { useColorsLegendStore } from "@/lib/colors-legend-store";
 import { LineChart } from "@mantine/charts";
 import arrow_image from '@/assets/side_plot_show.png'
+import { notifications } from "@mantine/notifications";
 
 export default function Home() {
 	const [endAnalysis, setEndAnalysis] = useState(false)
@@ -22,9 +23,13 @@ export default function Home() {
 	const [sliderValue, setSliderValue] = useState(0);
 	const [sequencing, setSequencing] = useState(false)
 	const [frequence, setFrequence] = useState('absolute')
-	const isFirstRender = useRef(true);
+	const isFirstRender = useRef(0);
 	const [base, setBase] = useState(0)
 	const [exponent, setExponent] = useState(0)
+	const [depth, setDepth] = useState(3)
+	const [changingDepth, setChangingDepth] = useState(false)
+	const [error, setError] = useState(false)
+	const [percentage, setPercentage] = useState(0)
 
 	const { colors, addColor, resetColors, changeColor, updateChangingColor, changingColor } = useColorsLegendStore()
 	const thumbOffset = (0.17 * sliderValue) - 14
@@ -36,21 +41,74 @@ export default function Home() {
 		_colors.map((c, i) => addColor({ label: c.label, color: colorsPicker[i % 20] }))
 	}
 
-	async function handleSubmit() {
+	const pollPercentageUntilComplete = async () => {
+		let isComplete = false
+
+		while (!isComplete) {
+			try {
+				const res = await fetch('/api/check_percentage', {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				})
+				const data = await res.json()
+				const percentStr = data.stdout || "0%"
+				const percent = parseFloat(percentStr.replace('%', ''))
+
+				setPercentage(Math.max(1, percent - 10))
+
+				if (percent >= 100) {
+					isComplete = true
+				} else {
+					await new Promise(resolve => setTimeout(resolve, 1000))
+				}
+			} catch (e) {
+				console.error("Errore durante il polling:", e)
+				await new Promise(resolve => setTimeout(resolve, 2000))
+			}
+		}
+	}
+
+
+	const handleSubmit = async () => {
 		setEndAnalysis(false)
 		setLoading(true)
-		const res = await fetch('/api/proxy', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				sim: parseJson(),
-				image: parseColors()
-			}),
-		})
+		setPercentage(1)
+		try {
+			await fetch('/api/clean_data', {
+				method: "GET",
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
+			const proxyResponsePromise = fetch('/api/proxy', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					sim: parseJson(),
+					image: parseColors(),
+					depth: depth
+				}),
+			})
 
-		addColorsStarting((await res.json())['stdout'])
+			await pollPercentageUntilComplete()
+
+			const res = await proxyResponsePromise;
+			const data = await res.json();
+			addColorsStarting(data['stdout']);
+
+
+		} catch (e) {
+			notifications.show({
+				title: 'Error in starting populations',
+				message: 'The populations should ...',
+				color: 'red'
+			})
+			setLoading(false)
+		}
 
 		const res2 = await fetch('/api/draw_plot', {
 			method: 'POST',
@@ -70,12 +128,54 @@ export default function Home() {
 
 		setVersion(Date.now());
 		setEndAnalysis(true)
+		setPercentage(100)
 		setLoading(false)
 	}
 
 	useEffect(() => {
-		if (isFirstRender.current) {
-			isFirstRender.current = false;
+		if (isFirstRender.current < 2) {
+			isFirstRender.current++;
+			return;
+		}
+		const fetchData = async () => {
+			const res = await fetch('/api/get_obs_tum', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					depth: depth
+				}),
+			});
+
+			addColorsStarting((await res.json())['stdout'])
+
+			const res2 = await fetch('/api/draw_plot', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					sim: parseJson(),
+					image: parseColors()
+				}),
+			});
+
+			const result = await res2.json();
+
+			setVersion(Date.now());
+			setEndAnalysis(true);
+			setLoading(false);
+			setChangingDepth(false)
+		};
+
+		setChangingDepth(true)
+		fetchData();
+	}, [depth])
+
+	useEffect(() => {
+		if (isFirstRender.current < 2) {
+			isFirstRender.current++;
 			return;
 		}
 		const fetchData = async () => {
@@ -111,9 +211,25 @@ export default function Home() {
 				<Divider my="md" />
 				<FunctionalEvents />
 				<Divider my="md" />
-				<Group justify="flex-end" >
-					<Button color={colorsRunButton} autoContrast leftSection={<IconPlayerPlayFilled size={14} />} loading={loading} onClick={() => handleSubmit()} variant="filled" size={"xl"} radius={"md"}>Run Simulation</Button>
-				</Group>
+				<Grid justify="center" align="center">
+					<GridCol span={"auto"}>
+						{percentage !== 0 && !endAnalysis && (
+							<Progress color={colorsAddButtonIcon} value={percentage} striped animated transitionDuration={200} />
+						)}
+					</GridCol>
+					<GridCol span={"content"}>
+						<Group justify="flex-end" >
+							<Button color={colorsRunButton}
+								autoContrast
+								leftSection={<IconPlayerPlayFilled size={14} />}
+								loading={loading}
+								onClick={() => handleSubmit()}
+								variant="filled" size={"xl"} radius={"md"}>
+								Run Simulation
+							</Button>
+						</Group>
+					</GridCol>
+				</Grid>
 				{endAnalysis &&
 					<>
 						<h1>Results</h1>
@@ -125,10 +241,14 @@ export default function Home() {
 							</GridCol>
 							<GridCol span={3}>
 								<ButtonGroup>
-									<Button color={colorsAddButtonIcon} variant="outline" size={"xs"} radius="md">
+									<Button disabled={changingDepth || depth <= 2} color={colorsAddButtonIcon} onClick={() => {
+										if (depth > 2) setDepth(depth - 1)
+									}} variant="outline" size={"xs"} radius="md">
 										<IconMinus />
 									</Button>
-									<Button color={colorsAddButtonIcon} variant="outline" size={"xs"} radius="md" >
+									<Button disabled={changingDepth || depth >= 4} color={colorsAddButtonIcon} onClick={() => {
+										if (depth < 4) setDepth(depth + 1)
+									}} variant="outline" size={"xs"} radius="md" >
 										<IconPlus />
 									</Button>
 								</ButtonGroup>
@@ -161,12 +281,13 @@ export default function Home() {
 												whiteSpace: 'nowrap',
 											}}
 										>
-											<Text size="xl">{frequence.toUpperCase()} Frequence</Text>
+											<Text size="xl">{frequence === 'absolute' && <>Absolute</>} {frequence === 'relative' && <>Relative</>}Frequence</Text>
 										</Box>
 									</Box>
 								</GridCol>
 								<GridCol span={10}>
 									<div style={{ width: "100%", aspectRatio: "16/9", position: "relative" }}>
+										<LoadingOverlay visible={changingDepth} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
 										<Image
 											key={version}
 											src={`/api/image?v=${version}&frequence=${frequence}`}
@@ -194,7 +315,7 @@ export default function Home() {
 													curveType="linear"
 													dataKey="date"
 													series={[
-														{ name: 'Apples', color: colorsAddButtonIcon },
+														{ name: 'Apples', color: 'black' },
 													]}
 													style={{ width: "100%", height: "100%" }}
 												/>
@@ -203,7 +324,7 @@ export default function Home() {
 									</div>
 									{sequencing &&
 										<>
-											<Slider color={colorsAddButtonIcon} domain={[0, 100]} styles={{
+											<Slider color={'black'} domain={[0, 100]} styles={{
 												bar: {
 													height: '1px',
 													width: '1px'
@@ -217,11 +338,12 @@ export default function Home() {
 
 											<div
 												style={{
-													transform: `translateX(${sliderPercent - 3}%)`,
+													transform: `translateX(${sliderPercent - 3.5}%)`,
 													transition: 'left 0.2s ease',
+													marginTop: "1%"
 												}}
 											>
-												<Button w="60px" color={colorsAddButtonIcon} autoContrast variant="filled">GO</Button>
+												<Button w="60px" color={"black"} autoContrast variant="filled">GO</Button>
 											</div>
 										</>
 									}
@@ -272,7 +394,7 @@ export default function Home() {
 								</GridCol>
 							</Grid>
 
-							<Grid pos={"relative"} pt={"md"} pb={"md"}>
+							<Grid pos={"relative"} pt={"md"} pb={"md"} px={"md"}>
 								<LoadingOverlay visible={changingColor} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
 
 								{colors.map((c, index) => {

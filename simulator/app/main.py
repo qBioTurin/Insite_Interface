@@ -5,6 +5,16 @@ import os
 
 app = Flask(__name__)
 
+@app.route("/clean_data", methods=['GET'])
+def clean_data():
+    try:
+        os.system("rm -rf /data/*")
+
+        return jsonify({
+            "stdout": 'ok',
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/run-r", methods=["POST"])
 def run_r_script():
@@ -12,7 +22,6 @@ def run_r_script():
         param = request.json
 
         os.makedirs("/data", exist_ok=True)
-        os.system("rm -rf /data/*")
 
         # Salva i parametri come file JSON
         with open("/data/params.json", "w") as f:
@@ -31,9 +40,10 @@ def run_r_script():
     
 @app.route("/get_obs_tum", methods=["GET"])
 def get_obs_tum():
+    depth = request.args.get("depth")
     try:
         subprocess.run(
-            ["Rscript", "/app/scripts/get_obs_tum.R", "/data", "3"],
+            ["Rscript", "/app/scripts/get_obs_tum.R", "/data", depth],
             capture_output=True,
             text=True
         )
@@ -69,6 +79,22 @@ def draw_plot():
         
         return jsonify({
             "stdout": data,
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/check_percentage", methods=["GET"])
+def check_percentage():
+    try:
+        folder_path = "/data/sim1" 
+        total_expected = 50
+
+        num_files = len([f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))])
+
+        percentage = (num_files / total_expected) * 100
+
+        return jsonify({
+            "stdout": f"{percentage:.2f}%"
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500

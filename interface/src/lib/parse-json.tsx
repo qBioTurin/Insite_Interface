@@ -134,11 +134,15 @@ export function parseJson() {
 	const phenotype: any[] = []
 	const numCells: number[] = []
 
-	populations.filter(p => p.mutations.length > 0).map((p) => {
-		genotype.push(p.mutations.map(m => Number(findDataByKey(tree, m))))
-		phenotype.push(p.mutations.map(m => mutations.filter(m1 => m1.name === m)[0].event))
-		numCells.push(p.numberOfCells)
-	})
+	try {
+		populations.filter(p => p.mutations.length > 0).map((p) => {
+			genotype.push(p.mutations.map(m => Number(findDataByKey(tree, m))))
+			phenotype.push(p.mutations.map(m => mutations.filter(m1 => m1.name === m)[0].event))
+			numCells.push(p.numberOfCells)
+		})
+	} catch (e) {
+		throw new Error('Internal server error: Populations')
+	}
 
 	const jsonObject = {
 		cellLife: cellLifeDays,

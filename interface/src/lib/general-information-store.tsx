@@ -5,17 +5,19 @@ interface GeneralInformation {
   carryingCapacity: number;
   mutationRate: number;
   mutableBases: number;
-
   endingTime: number;
+  
   savingCheckpoints: number;
+  threads: number;
 
   setCellLifeDays: (v: number) => void;
   setCarryingCapacity: (v: number) => void;
   setMutationRate: (v: number) => void;
   setMutableBases: (v: number) => void;
-
   setEndingTime:  (v: number) => void;
+  
   setSavingCheckpoints:  (v: number) => void;
+  setThreads: (v: number) => void;
 }
 
 export const useGeneralInformationStore = create<GeneralInformation>((set) => ({
@@ -26,6 +28,7 @@ export const useGeneralInformationStore = create<GeneralInformation>((set) => ({
 
   endingTime: 2 * 365,
   savingCheckpoints: 50,
+  threads: 1,
 
   setCellLifeDays: (v) => set({ cellLifeDays: v }),
   setCarryingCapacity: (v) => set({ carryingCapacity: v }),
@@ -34,4 +37,5 @@ export const useGeneralInformationStore = create<GeneralInformation>((set) => ({
   
   setEndingTime: (v) => set({ endingTime: v }),
   setSavingCheckpoints: (v) => set({ savingCheckpoints: v }),
+  setThreads: (v) => set({ threads: v })
 }));

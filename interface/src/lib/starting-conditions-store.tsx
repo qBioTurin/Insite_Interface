@@ -12,6 +12,8 @@ interface StartingConditions {
 	addMutations: (mut: Mutation) => void;
 	updateMutations: (mut: Mutation, event: number) => void;
 	updateNextMutationId: () => void;
+	removeMutation: (mut: Mutation) => void;
+	resetMutations: () => void;
 
 	addPopulation: (population: Population) => void;
 	updateNextPopulationId: () => void;
@@ -42,6 +44,17 @@ export const useStartingConditionsStore = create<StartingConditions>((set) => ({
 	updateNextMutationId: () =>
 		set((state) => ({
 			nextMutationId: state.nextMutationId + 1,
+		})),
+	removeMutation: (mut) =>
+		set((state) => ({
+			mutations: state.mutations.filter(
+				(m) => mut.name !== m.name
+			),
+			populations: state.populations.map((p) => {return {...p, mutations: p.mutations.filter(m => mut.name !== m)}})
+		})),
+	resetMutations: () =>
+		set(() => ({
+			mutations: []
 		})),
 
 	addPopulation: (population) =>
