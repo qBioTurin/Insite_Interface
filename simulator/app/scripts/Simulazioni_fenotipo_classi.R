@@ -36,7 +36,7 @@ simulazione<-function(Nexp,seed=.Random.seed,path,starting_gen,starting_fun_eff,
     check_cond_end<-TRUE
     while(check_cond_end | length(Zprovv)==0 ||sum(sapply(Zprovv,Ncells))==0){
       
-      count<-1
+      count<-0
       Zprovv<-mapply(Population=starting_pop,
                      Ncells=Ncells_start,
                      Nmut=Nmut,
