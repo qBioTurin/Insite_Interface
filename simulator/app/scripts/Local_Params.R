@@ -56,8 +56,8 @@ setMethod("get_local_params",
             
             
             
-            if(time_provv+Delta*Parameters@av_lifespan>Parameters@print_time[count]){ # SE SUPERO PRINT TIME mi fermo lì
-              Delta<-(Parameters@print_time[count]-time_provv)#/Parameters@av_lifespan
+            if(time_provv+Delta*Parameters@av_lifespan>Parameters@print_time[count+1]){ # SE SUPERO PRINT TIME mi fermo lì
+              Delta<-(Parameters@print_time[count+1]-time_provv)#/Parameters@av_lifespan
             }
             local_Params<-new("Local_Params",
                               phenotypes_local=phenotypes_local,

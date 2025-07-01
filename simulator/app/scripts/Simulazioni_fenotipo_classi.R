@@ -96,7 +96,7 @@ simulazione<-function(Nexp,seed=.Random.seed,path,starting_gen,starting_fun_eff,
           }else{
             check_cond_end<-(time_provv<tmax)
           }
-        if(time_provv>=parameters@print_time[count]){
+        if(time_provv>=parameters@print_time[count+1]){
           count<-count+1
           print(time_provv)
           save(list = c("Zprovv","time_provv"),
