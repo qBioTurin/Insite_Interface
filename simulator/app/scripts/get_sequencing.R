@@ -6,14 +6,13 @@ source("scripts/Population_with_size_nmut.R")
 
 args<-commandArgs(trailingOnly = TRUE)
 if(interactive()){
-  args <- c("raw",453)
+  args <- c("raw",31)
 }
 path<-args[1]
-time_seq<-as.numeric(args[2])
 
 load(paste(path,"/Parameters.RData",sep=""))
 
-num_seq<-which.min(abs(parameters@print_time-time_seq))
+num_seq<-as.numeric(args[2])
 Nexp<-1
 
 load(paste(path,"/sim",Nexp,"/Zprovv",num_seq,".RData",sep=""))
