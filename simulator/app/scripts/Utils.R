@@ -191,310 +191,6 @@ setMethod("get_obs_tumor",
           )
           })
 
-setGeneric("get_edges",function(roots_tmp, vectors_tmp, edges = list()) standardGeneric("get_edges"))
-setMethod("get_edges",
-          signature(roots_tmp="vector",
-                    vectors_tmp="vector",
-                    edges="list"),
-          function(roots_tmp, vectors_tmp, edges = list()) {
-            for (root_tmp in roots_tmp) {
-              vectors_tmp1 <- vectors_tmp[unlist(map(vectors_tmp, ~ root_tmp %in% .x))]
-              if (any(sapply(vectors_tmp1, length) > 1)) {
-                new_vectors <- vectors_tmp1[sapply(vectors_tmp1, length) != 1]
-                new_vectors <- lapply(new_vectors, function(x) { x[x != root_tmp] })
-                branches_roots <- new_vectors[sapply(new_vectors, length) == 1]
-                
-                edges <- get_edges(branches_roots, new_vectors, edges)
-                edges <- append(map(branches_roots, ~ c(root_tmp, .x)),edges)
-              }
-            }
-            return(edges)
-          })
-
-setGeneric("get_tree_plot",function(parameters,obs_Pop_ID) standardGeneric("get_tree_plot"))
-setMethod("get_tree_plot",
-          signature(parameters="Parameters",
-                    obs_Pop_ID="tbl"),
-          function(parameters,obs_Pop_ID){
-            tryCatch(expr = {
-              obs_unique_mut_ID<-obs_Pop_ID%>%
-                rowwise()%>%
-                mutate(obs_genotypes=list(genotype(Populations)),
-                       obs_mut=list(obs_genotypes),
-                       length_gen=length(obs_genotypes))%>%
-                unnest(obs_mut)%>%
-                rowwise()%>%
-                mutate(pos_mut=which(obs_genotypes==obs_mut))%>%
-                group_by(obs_mut,pos_mut)%>%
-                mutate(min_length_gen=min(length_gen),
-                       n=sum(length_gen==min_length_gen),
-                       unique_obs_mut_ID=ifelse(
-                         n>1,
-                         paste0(
-                           paste(LETTERS[pos_mut],
-                                 obs_mut,
-                                 sep=""),
-                           1:n,
-                           sep="-"),
-                         paste(LETTERS[pos_mut],
-                               obs_mut,
-                               sep="")
-                       )
-                )%>%
-                ungroup()%>%
-                dplyr::select(Population_ID,unique_obs_mut_ID)%>%
-                group_by(Population_ID)%>%
-                mutate(unique_obs_mut_ID=list(unique_obs_mut_ID))%>%
-                pull(unique_obs_mut_ID)%>%
-                unique()
-              
-              
-              obs_functional_effects<-obs_Pop_ID%>%
-                rowwise()%>%
-                mutate(obs_functional_effect=list(functional_effect(Populations)))%>%
-                pull(obs_functional_effect)
-              
-              root <- as.character(Reduce(intersect, obs_unique_mut_ID))
-              
-              edges<-unlist(get_edges(root,obs_unique_mut_ID,edges = list()))
-              
-              g<-make_graph(edges=edges)
-              
-              palette<-as.character(moma.colors("Levine1",parameters@I))
-              
-              mut_functional_effects<-tibble(obs_unique_mut_ID,obs_functional_effects)%>%
-                unnest(c(obs_unique_mut_ID,obs_functional_effects))%>%
-                distinct()
-              
-              vertex_attr(g)$type<-mut_functional_effects$obs_functional_effects
-              
-              
-              plot(g,#main=title,
-                   edge.arrow.size=0.2,
-                   edge.width=1,
-                   vertex.color=palette[V(g)$type],
-                   vertex.size=30,
-                   vertex.frame.color=palette[V(g)$type],
-                   vertex.label.color="white",
-                   vertex.label.cex=0.5,
-                   vertex.label.dist=0)
-              legend("topright",  
-                     legend = unique(mut_functional_effects$obs_functional_effects),  
-                     col = palette[unique(mut_functional_effects$obs_functional_effects)],  
-                     pch = 21,  
-                     pt.bg = palette[unique(mut_functional_effects$obs_functional_effects)],  
-                     pt.cex = 1.5,  
-                     bty = "n", 
-                     title = "Functional \n effects",
-                     cex = 0.8) 
-            },
-            error=function(cond) {
-              message(conditionMessage(cond))
-              
-              plot(0,0,axes=F,col="white")
-              text(0,0, "Error in the tree plot")
-              })
-            
-          })
-
-
-setGeneric("get_my_tree_plot",function(obs_Pop_ID,obs_tumor_tibble,functional_effects) standardGeneric("get_my_tree_plot"))
-setMethod("get_my_tree_plot",
-          signature(obs_Pop_ID="tbl",
-                    obs_tumor_tibble="tbl"),
-          function(obs_Pop_ID,obs_tumor_tibble,functional_effects){
-            tryCatch(expr = {
-              
-              palette<-as.character(moma.colors("Levine1",length(functional_effects)))
-              table_f_e<-table(functional_effects)
-              num_fun_eff<-sapply(table_f_e,function(n){1:n})
-              
-              if(!is.null(names(functional_effects))){
-                names(palette)<-names(functional_effects)
-              }else{
-                names(palette)<-unlist(sapply(unique(functional_effects),
-                                              function(name){
-                                                if(sum(functional_effects==name)==1){name}
-                                                else{paste0(name,num_fun_eff[[name]])}
-                                              },
-                                              simplify = TRUE
-                ))
-              }
-              
-              
-              obs_tumor_tibble$time<-as.numeric(obs_tumor_tibble$time)
-              
-              unique_mut_id<-lapply(obs_Pop_ID$Populations,function(p){
-                g<-genotype(p)
-                unique_id_mut<-vector()
-                for(i in 1:length(g)){
-                  unique_id_mut<-c(unique_id_mut,paste(g[1:i],collapse="_"))
-                }
-                return(unique_id_mut)
-              })
-              
-              Points<-tibble(obs_Pop_ID,obs_mut=unique_mut_id)%>%
-                merge(obs_tumor_tibble%>%
-                        group_by(Population_ID)%>%
-                        filter(time==min(time)))%>%
-                arrange(time)%>%
-                rowwise()%>%
-                mutate(obs_genotypes=list(genotype(Populations)),
-                       length_gen=length(obs_genotypes),
-                       pos_mut=list(1:length_gen),
-                       functional_effect=list(get_fun_eff_label(Populations,functional_effects))
-                       )%>%
-                unnest(c(obs_mut,pos_mut,functional_effect))%>%
-                group_by(pos_mut)%>%
-                mutate(node=paste(LETTERS[pos_mut],
-                                 1:length(unique(obs_mut)),
-                                 sep="")
-                       )%>%
-                ungroup()%>%
-                group_by(obs_genotypes)%>%
-                mutate(parents=lag(node))%>%
-                ungroup()%>%
-                  group_by(node)%>%
-                  filter(time==min(time))%>%
-                dplyr::select(node,time,
-                              functional_effect,parents)%>%
-                distinct()
-              
-              get_ancestry <- function(node, data) {
-                parent <- data$parents[data$node == node]
-                if (length(parent) == 0 || all(is.na(parent))) {
-                  return(node)
-                } else {
-                  return(c(get_ancestry(parent, data), node))
-                }
-              }
-              
-              ancestry<-lapply(Points$node,get_ancestry,data=Points)
-              roots<-Points$node[lengths(ancestry)==min(lengths(ancestry))]
-              
-              Points <- Points %>%
-                bind_cols(ancestry=sapply(ancestry,paste,collapse="_"))
-              
-              vertexes<-Points$node
-              parents<-Points$parents
-              names(parents)<-vertexes
-              ancestry<-Points$ancestry
-              names(ancestry)<-vertexes
-              
-              v<-Points$node
-              num_sons<-vector()
-              i<-0
-              while(length(v)>0){
-                p<-parents[v]
-                ending_pts_provv<-v[!v%in%p]
-                num_sons[ending_pts_provv]<-i
-                i<-i+1
-                v<-setdiff(v,ending_pts_provv)
-              }
-              
-              
-              y<-tibble()
-              for(n_s in 0:max(num_sons)){
-                ending_pts_provv<-names(num_sons[num_sons==n_s])
-                par<-parents[ending_pts_provv]
-                par[is.na(par)]<-"0"
-                anc<-ancestry[ending_pts_provv]
-                if(n_s==0){
-                  y_ending_pts<-1:length(ending_pts_provv)-mean(1:length(ending_pts_provv))
-                  y<-full_join(Points,tibble(node=names(sort(anc)),y_ending_pts))
-                  
-                }
-                else{
-                  y_tmp<-y%>%
-                    filter(parents%in%ending_pts_provv)%>%
-                    group_by(parents)%>%
-                    summarise(y_ending_pts=mean(y_ending_pts))
-                  y$y_ending_pts[y$node%in%y_tmp$parents]<-y_tmp$y_ending_pts
-                }
-              }
-              
-              Points<-merge(y,
-                            Points)
-              
-              if(sum(Points$time==min(Points$time))>length(roots)){
-                Points$time[Points$node==roots]<-Points$time[Points$node==roots]-1/10*(max(Points$time)-min(Points$time))
-              }
-              
-              segments<-tibble()
-              for(v in vertexes){
-                p<-parents[v]
-                arc<-paste(p,v,sep="_")
-                if(!is.na(p)){
-                  x<-Points$time[Points$node==p]
-                  y<-Points$y_ending_pts[Points$node==p]
-                  x_end<-Points$time[Points$node==v]
-                  y_end<-Points$y_ending_pts[Points$node==v]
-                  segments<-bind_rows(
-                    segments,tibble(p,v,arc,x,y,x_end,y_end)
-                  )
-                }
-              }
-              
-              min_y<-min(Points$y_ending_pts)
-              max_y<-max(Points$y_ending_pts)
-              
-              min_x<-min(Points$time)
-              max_x<-max(obs_tumor_tibble$time)
-              
-              ggplot()+
-                geom_rect(aes(xmin=min(obs_tumor_tibble$time),
-                          xmax=max(obs_tumor_tibble$time),
-                          ymin=min_y-abs(max_y-min_y)/10,
-                          ymax=max_y+abs(max_y-min_y)/10),
-                          fill="#EFECE6")+
-              geom_segment(data=segments%>%
-                             dplyr::select(arc,x,x_end,y_end),
-                           aes(x = x,y=y_end,xend = x_end,yend = y_end,group = arc)
-              )+
-                geom_segment(data=segments%>%
-                               dplyr::select(arc,x,y,y_end),
-                             aes(x = x,y=y,xend = x,yend = y_end,group = arc)
-                )+
-                  
-                geom_point(data=Points,
-                           aes(x=time,
-                               y=y_ending_pts,
-                               fill=as.factor(functional_effect)),
-                           shape = 21,size = 10)+
-                geom_text(dat=Points,
-                          aes(x=time,
-                              y=y_ending_pts,
-                              label=node),size = 3
-                )+
-                geom_text(aes(x=max_x,
-                               y=max_y+abs(max_y-min_y)/10,
-                               label="Time of the simulation"),
-                           hjust=1,vjust=0,color="#BFB39B")+
-                ylim(min_y-abs(max_y-min_y)/10,max_y+abs(max_y-min_y)/10)+
-                xlim(min_x-abs(max_x-min_x)/10,max_x+abs(max_x-min_x)/10)+
-                guides(fill=guide_legend(title="Functional Effect",
-                                         override.aes = list(size = 8)))+
-                scale_fill_manual(values=palette)+
-                theme_void()+
-                theme(legend.title = element_text(size=10),
-                      legend.text = element_text(size=8),
-                      legend.position ="bottom",
-                      legend.box = "vertical"
-                      )
-            },
-            error=function(cond) {
-              message(conditionMessage(cond))
-              
-              ggplot() +
-                annotate("text",
-                         x = 1,
-                         y = 1,
-                         label = "Error in the tree plot",
-                         size = 6,
-                         fontface = "bold") +
-                theme_void()
-            })
-          })
 
 setGeneric("get_muller_plot_show",function(obs_Pop_ID,obs_tumor_tibble,functional_effects,freq,palette) standardGeneric("get_muller_plot_show"))
 setMethod("get_muller_plot_show",
@@ -1155,4 +851,215 @@ setMethod("get_muller_plot_download",
                 theme_void()
             })
           })
+
+
+elbowed_link_right_up<-function(x1,y1,x2,y2,r){
+  
+  theta <- seq(-pi/2, 0, length.out = 20)  
+  arc <- data.frame(
+    x = x2 - r + r * cos(theta),
+    y = y1 +r + r * sin(theta)
+  )
+  
+  path <- bind_rows(
+    data.frame(x = c(x1, x2-r), y = c(y1, y1)),  
+    arc,
+    data.frame(x = c(x2, x2), y = c(y1 + r, y2))   
+  )
+  return(path)
+}
+
+elbowed_link_right_down<-function(x1,y1,x2,y2,r){
+  theta <- seq(pi/2, 0, length.out = 20)  # 0 to 90 degrees
+  arc <- data.frame(
+    x = x2 -r + r * cos(theta),
+    y = y1 -r  + r * sin(theta)
+  )
+  
+  path <- bind_rows(
+    data.frame(x = c(x1, x2-r), y = c(y1, y1)),  # horizontal
+    arc,
+    data.frame(x = c(x2, x2), y = c(y1 -r, y2))   # vertical
+  )
+  return(path)
+}
+
+elbowed_link_up_right<-function(x1,y1,x2,y2,r){
+  theta <- seq(pi, pi/2, length.out = 20)  # 0 to 90 degrees
+  arc <- data.frame(
+    x = x1 +r + r * cos(theta),
+    y = y2 -r  + r * sin(theta)
+  )
+  
+  path <- bind_rows(
+    data.frame(x = c(x1, x1), y = c(y1, y2-r)),  # horizontal
+    arc,
+    data.frame(x = c(x1+r, x2), y = c(y2, y2))   # vertical
+  )
+  return(path)
+}
+
+elbowed_link_down_right<-function(x1,y1,x2,y2,r){
+  theta <- seq(pi, 3*pi/2, length.out = 20)  # 0 to 90 degrees
+  arc <- data.frame(
+    x = x1 + r + r * cos(theta),
+    y = y2 + r  + r * sin(theta)
+  )
+  
+  path <- bind_rows(
+    data.frame(x = c(x1, x1), y = c(y1, y2+r)),  # horizontal
+    arc,
+    data.frame(x = c(x1+r, x2), y = c(y2, y2))   # vertical
+  )
+  return(path)
+}
+
+elbowed_link<-function(x1,y1,x2,y2,r,x_mean){
+  x_left<-min(x1,x2)
+  x_right<-max(x1,x2)
+  y_left<-c(y1,y2)[which.min(c(x1,x2))]
+  y_right<-c(y1,y2)[which.max(c(x1,x2))]
+  
+  x_mid<-x_mean
+  y_mid<-mean(c(y1,y2))
+  
+  
+  if(y_left<y_right){
+    link<-bind_rows(elbowed_link_right_up(x_left,y_left,x_mid,y_mid,r),
+                    elbowed_link_up_right(x_mid,y_mid,x_right,y_right,r))
+  }else if(y_left>y_right){
+    link<-bind_rows(elbowed_link_right_down(x_left,y_left,x_mid,y_mid,r),
+                    elbowed_link_down_right(x_mid,y_mid,x_right,y_right,r))
+  }else{
+    link<-tibble(x=c(x_left,x_right),y=c(y_left,y_right))
+  }
+  return(link)
+}
+
+get_tree_plot_app<-function(df,palette){
+  if(nrow(df)==1){
+    wanted_mut<-"1"
+    plot<-ggplot(df)+
+      geom_label(aes(x=0,y=0,label="Mut1",
+                     fill=fun_eff),
+                 label="Mut1",
+                 #size=1.5,
+                 size=size_label,
+                 label.r =unit(0.5,"lines"),
+                 label.size = 0)+
+      xlim(-0.1,0.1)+
+      ylim(-0.1,0.1)+
+      coord_fixed()+
+      scale_fill_manual(values=c("#F7CE5B","#0CBABA","#A53860"),na.value = "white")+
+      theme_void()+
+      theme(legend.position = "none")
+  }
+  else{
+    wanted_mut<-unname(
+      unlist(
+        lapply(split(df$mut,
+                     df$parent),
+               function(v){
+                 v_filt<-v[(v%in%unique(df$parent))]
+                 v_filt<-c(v_filt,v[!v%in%v_filt][1])
+                 return(v_filt)
+               }
+        )
+      )
+    )
+    
+    wanted_mut<-unique(c(wanted_mut,unique(df$mut[is.na(df$parent)])))
+
+    mut_info<-df%>%
+      mutate(wanted=ifelse(mut%in%wanted_mut,TRUE,FALSE))%>%
+      group_by(parent)%>%
+      summarise(ndaught_drawn=sum(wanted),
+                ndaught_hidden=n()-ndaught_drawn)%>%
+      filter(!is.na(parent)&ndaught_hidden>0)%>%
+      rowwise()%>%
+      mutate(mut=paste(parent,"n",sep="_"),
+             label=paste(ndaught_hidden,"more"),
+             fun_eff=as.character(NA),
+             mut_generation=df$mut_generation[df$mut==parent]+1)%>%
+      dplyr::select(mut,parent,label,mut_generation,fun_eff)%>%
+      ungroup()
+    
+    mut_info<-df%>%
+      filter(mut%in%wanted_mut)%>%
+      mutate(label=paste("mut",row_number(),sep=""))%>%
+      dplyr::select(mut,parent,label,fun_eff,mut_generation)%>%
+      bind_rows(mut_info)
+
+    g <- graph_from_data_frame(mut_info%>%dplyr::select(parent,mut)%>%filter(!is.na(parent)), directed = TRUE)
+    layout_df <- create_layout(g, layout = "dendrogram", circular = FALSE)
+    
+    x_grid<-length(unique(layout_df$y))
+    y_grid<-sum(layout_df$leaf)
+    x_range<-c(0,1.2)
+    y_range<-c(0,1)
+    
+    layout_df<-layout_df%>%
+      filter(name!=0)%>%
+      rowwise()%>%
+      mutate(y=x_grid-mut_info$mut_generation[mut_info$mut==name])%>%
+      ungroup()
+    
+    nodes_coord<-tibble(x=rescale(-layout_df$y,to=x_range),
+                        y=rescale(-layout_df$x,to=y_range),
+                        mut=layout_df$name)%>%
+      merge(mut_info%>%dplyr::select(mut,label,fun_eff,mut_generation))%>%
+      group_by(mut_generation)%>%
+      mutate(n_mut_layer=n())
+    
+    size_label<-min(40/max(nodes_coord$n_mut_layer),6)
+    
+    mid_pts<-rescale(1:(x_grid+1),to=x_range)
+    
+    edges_coord<-tibble(
+      x1=sapply(mut_info$parent[!is.na(mut_info$parent)],
+                function(parent){nodes_coord$x[nodes_coord$mut==parent]}),
+      y1=sapply(mut_info$parent[!is.na(mut_info$parent)],
+                function(parent){nodes_coord$y[nodes_coord$mut==parent]}),
+      x2=sapply(mut_info$mut[!is.na(mut_info$parent)],
+                function(mut){nodes_coord$x[nodes_coord$mut==mut]}),
+      y2=sapply(mut_info$mut[!is.na(mut_info$parent)],
+                function(mut){nodes_coord$y[nodes_coord$mut==mut]}),
+      x_mid=sapply(mut_info$mut[!is.na(mut_info$parent)],
+                   function(mut){mid_pts[mut_info$mut_generation[mut_info$mut==mut]]})
+    )
+    
+    radius<-edges_coord%>%
+      rowwise()%>%
+      mutate(r=min(abs(x1-x2),abs(y1-y2))/2)%>%
+      pull(r)
+    
+    r<-min(radius[radius>0])
+    
+    link<-edges_coord%>%
+      rowwise()%>%
+      mutate(link=list(as_tibble(elbowed_link(x1,y1,x2,y2,r,x_mid))))%>%
+      ungroup()%>%
+      pull(link)%>%bind_rows(.id="mut")
+    
+    x_lim<-range(nodes_coord$x)+c(-0.1,0.1)
+    y_lim<-range(nodes_coord$y)+c(-0.1,0.1)
+    plot<-ggplot()+
+      geom_path(data=link,
+                aes(x=x,y=y,group=mut))+
+      geom_label(data=nodes_coord,
+                 aes(x=x,y=y,label=label,
+                     fill=fun_eff),
+                 #size=1.5,
+                 size=size_label,
+                 label.r =unit(0.5,"lines"),
+                 label.size = 0)+
+      xlim(x_lim)+
+      ylim(y_lim)+
+      coord_fixed()+
+      scale_fill_manual(values=c("#F7CE5B","#0CBABA","#A53860"),na.value = "white")+
+      theme_void()+
+      theme(legend.position = "none")
+  }
+  return(plot)
+}
 

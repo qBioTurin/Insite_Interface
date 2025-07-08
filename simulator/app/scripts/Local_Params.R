@@ -45,7 +45,8 @@ setMethod("get_local_params",
             mu_local<-(mu_local+abs(mu_local))/2
 
             
-            Delta<-min(
+            
+            Delta<-epsilon*sum(a_local+b_local+mu_local)*min(
               abs(
                 t(1/rowSums(t(Competition_local)*(a_local-b_local)*Ncells_sum)*
                     (Parameters@mu[populations_conv]+1)/max(Parameters@mu[populations_conv],1)*

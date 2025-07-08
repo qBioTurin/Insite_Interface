@@ -18,4 +18,6 @@ if (!require("cowplot")) install.packages("cowplot")
 if (!require("ggpubr")) install.packages("ggpubr")
 if (!require("patchwork")) install.packages("patchwork")
 if (!require("latex2exp")) install.packages("latex2exp")
+if (!require("ggraph")) install.packages("ggraph")
+if (!require("scales")) install.packages("scales")
 

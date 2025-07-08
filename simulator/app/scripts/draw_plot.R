@@ -6,7 +6,7 @@ source("scripts/Population_with_size_nmut.R")
 
 args<-commandArgs(trailingOnly = TRUE)
 if(interactive()){
-  args <- c("raw","raw/labeled_colors.json","output")
+  args <- c("raw","raw/label_color.json","output")
 }
 path_in<-args[1]
 path_out<-args[3]
@@ -18,12 +18,21 @@ json_palette<-fromJSON(file=json_palette_file)
 palette<-sapply(json_palette,function(el){el$color})
 names(palette)<-sapply(json_palette,function(el){el$label})
 
+Clones_df_absolute<-get_muller_plot_info(obs_Pop_ID = obs_tumor$obs_Pop_ID,
+                     obs_tumor_tibble = obs_tumor$obs_tumor_tibble,
+                     freq = FALSE,
+                     functional_effects = parameters@functional_effects)
 
-plot_show_absolute<-get_muller_plot_show(obs_Pop_ID = obs_tumor$obs_Pop_ID,
-                                obs_tumor_tibble = obs_tumor$obs_tumor_tibble,
+Clones_df_relative<-get_muller_plot_info(obs_Pop_ID = obs_tumor$obs_Pop_ID,
+                                         obs_tumor_tibble = obs_tumor$obs_tumor_tibble,
+                                         freq = TRUE,
+                                         functional_effects = parameters@functional_effects)
+
+save(Clones_df_relative,file=paste(path_in,"Clones_df_relative.RData",sep="/"))
+
+plot_show_absolute<-get_muller_plot_show(Clones_df = Clones_df_absolute,
                                 freq = FALSE,
-                                palette = palette,
-                                functional_effects = parameters@functional_effects)
+                                palette = palette)
 
 ggsave(plot_show_absolute,device = "png",
        path = path_out,
