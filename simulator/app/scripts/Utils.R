@@ -756,9 +756,9 @@ get_tree_plot_app<-function(df,palette){
     wanted_mut<-unname(
       unlist(
         lapply(split(df$mut,
-                     df$parent),
+                     df$parents),
                function(v){
-                 v_filt<-v[(v%in%unique(df$parent))]
+                 v_filt<-v[(v%in%unique(df$parents))]
                  v_filt<-c(v_filt,v[!v%in%v_filt][1])
                  return(v_filt)
                }
@@ -766,29 +766,29 @@ get_tree_plot_app<-function(df,palette){
       )
     )
     
-    wanted_mut<-unique(c(wanted_mut,unique(df$mut[is.na(df$parent)])))
+    wanted_mut<-unique(c(wanted_mut,unique(df$mut[is.na(df$parents)])))
 
     mut_info<-df%>%
       mutate(wanted=ifelse(mut%in%wanted_mut,TRUE,FALSE))%>%
-      group_by(parent)%>%
+      group_by(parents)%>%
       summarise(ndaught_drawn=sum(wanted),
                 ndaught_hidden=n()-ndaught_drawn)%>%
-      filter(!is.na(parent)&ndaught_hidden>0)%>%
+      filter(!is.na(parents)&ndaught_hidden>0)%>%
       rowwise()%>%
-      mutate(mut=paste(parent,"n",sep="_"),
+      mutate(mut=paste(parents,"n",sep="_"),
              label=paste(ndaught_hidden,"more"),
              fun_eff=as.character(NA),
-             mut_generation=df$mut_generation[df$mut==parent]+1)%>%
-      dplyr::select(mut,parent,label,mut_generation,fun_eff)%>%
+             mut_generation=df$mut_generation[df$mut==parents]+1)%>%
+      dplyr::select(mut,parents,label,mut_generation,fun_eff)%>%
       ungroup()
     
     mut_info<-df%>%
       filter(mut%in%wanted_mut)%>%
       mutate(label=paste("mut",row_number(),sep=""))%>%
-      dplyr::select(mut,parent,label,fun_eff,mut_generation)%>%
+      dplyr::select(mut,parents,label,fun_eff,mut_generation)%>%
       bind_rows(mut_info)
 
-    g <- graph_from_data_frame(mut_info%>%dplyr::select(parent,mut)%>%filter(!is.na(parent)), directed = TRUE)
+    g <- graph_from_data_frame(mut_info%>%dplyr::select(parents,mut)%>%filter(!is.na(parents)), directed = TRUE)
     layout_df <- create_layout(g, layout = "dendrogram", circular = FALSE)
     
     x_grid<-length(unique(layout_df$y))
@@ -811,19 +811,20 @@ get_tree_plot_app<-function(df,palette){
     
     size_label<-min(40/max(nodes_coord$n_mut_layer),6)
     
-    mid_pts<-rescale(1:(x_grid+1),to=x_range)
+    
+    mid_pts<-unique(nodes_coord$x)+x_range[2]/x_grid
     
     edges_coord<-tibble(
-      x1=sapply(mut_info$parent[!is.na(mut_info$parent)],
+      x1=sapply(mut_info$parents[!is.na(mut_info$parents)],
                 function(parent){nodes_coord$x[nodes_coord$mut==parent]}),
-      y1=sapply(mut_info$parent[!is.na(mut_info$parent)],
+      y1=sapply(mut_info$parents[!is.na(mut_info$parents)],
                 function(parent){nodes_coord$y[nodes_coord$mut==parent]}),
-      x2=sapply(mut_info$mut[!is.na(mut_info$parent)],
+      x2=sapply(mut_info$mut[!is.na(mut_info$parents)],
                 function(mut){nodes_coord$x[nodes_coord$mut==mut]}),
-      y2=sapply(mut_info$mut[!is.na(mut_info$parent)],
+      y2=sapply(mut_info$mut[!is.na(mut_info$parents)],
                 function(mut){nodes_coord$y[nodes_coord$mut==mut]}),
-      x_mid=sapply(mut_info$mut[!is.na(mut_info$parent)],
-                   function(mut){mid_pts[mut_info$mut_generation[mut_info$mut==mut]]})
+      x_mid=sapply(mut_info$mut[!is.na(mut_info$parents)],
+                   function(mut){mid_pts[mut_info$mut_generation[mut_info$mut==mut]-1]})
     )
     
     radius<-edges_coord%>%
