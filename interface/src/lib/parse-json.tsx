@@ -1,7 +1,7 @@
 import { TreeNode } from "@/components/interfaces";
 import { useFunctionalEventsStore } from "./functional-events-store";
 import { useStartingConditionsStore } from "./starting-conditions-store";
-import { useSimulationStepStore } from "./general-information-store";
+import { useSimulationStepStore } from "./simulation-step-store";
 
 function groupSets(sets: Set<string>[]): Set<string>[][] {
 	const groups: Set<string>[][] = [];

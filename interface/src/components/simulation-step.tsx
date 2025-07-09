@@ -2,7 +2,7 @@
 import { Accordion, AccordionControl, AccordionItem, AccordionPanel, Grid, GridCol, Group, NumberInput, Text } from "@mantine/core";
 import InputLabel from "./input-label";
 import { colorsPage } from "./colors";
-import { useSimulationStepStore } from "@/lib/general-information-store";
+import { useSimulationStepStore } from "@/lib/simulation-step-store";
 
 export default function SimulationStep() {
 	const {

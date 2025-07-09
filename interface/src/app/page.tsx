@@ -1,56 +1,44 @@
 'use client'
 import FunctionalEvents from "@/components/functional-events";
 import { parseJson } from "@/lib/parse-json";
-import Image from 'next/image';
 
-import { Box, Button, ButtonGroup, Container, Divider, Grid, GridCol, Group, LoadingOverlay, SegmentedControl, Slider, Stack, Text, Progress, ActionIcon, Card } from "@mantine/core";
+import { Button, Container, Divider, Grid, GridCol, Group, Progress, Card } from "@mantine/core";
 import React, { useEffect, useRef, useState } from "react";
-import { IconChevronDown, IconChevronUp, IconDownload, IconMinus, IconPlayerPlayFilled, IconPlus } from "@tabler/icons-react";
-import { colorsAddButtonIcon, colorsPage, colorsPicker, colorsRunButton } from "@/components/colors";
-import LabelledColorPicker from "@/components/labelledColorPicker";
+import { IconPlayerPlayFilled } from "@tabler/icons-react";
+import { colorsAddButtonIcon, colorsPicker, colorsRunButton } from "@/components/colors";
 import parseColors from "@/lib/parse-colors";
 import { useColorsLegendStore } from "@/lib/colors-legend-store";
-import { BarChart, LineChart } from "@mantine/charts";
-import arrow_image from '@/assets/side_plot_show.png'
+import { BarChart } from "@mantine/charts";
 import { notifications } from "@mantine/notifications";
 import PopulationsHeatmap from "@/components/charts/populations-heatmap";
-import SequencingTable from "@/components/charts/sequencing-table";
 import { useStartingConditionsStore } from "@/lib/starting-conditions-store";
 import SimulationStep from "@/components/simulation-step";
-import { useSimulationStepStore } from "@/lib/general-information-store";
+import { useSimulationStepStore } from "@/lib/simulation-step-store";
 import StartingConditions from "@/components/starting-conditions";
+import { useSimulationPlotOptionsStore } from "@/lib/simulation-plot-options";
+import { useSequencingStore } from "@/lib/sequencing-store";
+import SimulationResults from "@/components/simulation-results";
 
 export default function Home() {
 	const [endAnalysis, setEndAnalysis] = useState(false)
 	const [loading, setLoading] = useState(false)
-	const [version, setVersion] = useState<number | null>(null);
-	const [sliderValue, setSliderValue] = useState(0);
-	const [sequencing, setSequencing] = useState(false)
-	const [frequence, setFrequence] = useState('absolute')
 	const isFirstRender = useRef(0);
-	const [base, setBase] = useState(0)
-	const [exponent, setExponent] = useState(0)
-	const [depth, setDepth] = useState(3)
-	const [changingDepth, setChangingDepth] = useState(false)
-	const [error, setError] = useState(false)
+	// const [error, setError] = useState(false)
 	const [percentage, setPercentage] = useState(0)
-	const [loadSequencing, setLoadSequencing] = useState(false)
-	const [sequenced, setSequenced] = useState(false)
-	const [dataPlot, setDataPlot] = useState<{ nMut: number, nCells: number, nPop: number }[]>([])
-	const [dataPlotStacked, setDataPlotStacked] = useState<Record<string, string | number>[]>([])
-	const [series, setSeries] = useState<{ name: string; color: string; }[]>([])
 
 	const { colors, addColor, resetColors, changeColor, updateChangingColor, changingColor } = useColorsLegendStore()
-	const thumbOffset = (0.17 * sliderValue) - 14
+	const { sequenced, sequencingDay, setSequenced } = useSequencingStore()
 
-	const sliderPercent = (sliderValue / 100) * 100;
+	const { depth, updateImageVersion, setPlotBase, setPlotExponent, updateChangingDepth } = useSimulationPlotOptionsStore()
+
+	const {dataPlot, dataPlotStacked, series} = useSequencingStore()
 
 	function addColorsStarting(_colors: { color: string, label: string }[]) {
 		resetColors()
 		_colors.map((c, i) => addColor({ label: c.label, color: colorsPicker[i % 20] }))
 	}
 
-	const { savingCheckpoints, endingTime } = useSimulationStepStore()
+	const { savingCheckpoints } = useSimulationStepStore()
 
 	const { populations } = useStartingConditionsStore()
 
@@ -144,10 +132,10 @@ export default function Home() {
 		})
 
 		const val = (await res2.json()).stdout
-		setBase(val.base)
-		setExponent(val.exponent)
+		setPlotBase(val.base)
+		setPlotExponent(val.exponent)
 
-		setVersion(Date.now());
+		updateImageVersion()
 		setEndAnalysis(true)
 		setPercentage(100)
 		setLoading(false)
@@ -182,13 +170,13 @@ export default function Home() {
 				}),
 			});
 
-			setVersion(Date.now());
+			updateImageVersion()
 			setEndAnalysis(true);
 			setLoading(false);
-			setChangingDepth(false)
+			updateChangingDepth(false)
 		};
 
-		setChangingDepth(true)
+		updateChangingDepth(true)
 		fetchData();
 	}, [depth])
 
@@ -212,7 +200,7 @@ export default function Home() {
 			const result = await res2.json();
 			console.log(result);
 
-			setVersion(Date.now());
+			updateImageVersion()
 			setEndAnalysis(true);
 			setLoading(false);
 			updateChangingColor()
@@ -221,70 +209,6 @@ export default function Home() {
 		updateChangingColor();
 		fetchData();
 	}, [changeColor])
-
-	async function getSequencing() {
-		setLoadSequencing(true)
-		const numSeq = sliderPercent * savingCheckpoints / 100
-		const res2 = await fetch(`/api/get_sequencing?numSeq=${numSeq}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-
-		const result = await res2.json();
-		console.log(result);
-		setLoadSequencing(false)
-		setSequenced(true)
-		const stdout = result.stdout;
-		const data: { nMut: number; nCells: number; nPop: number }[] = Object.keys(stdout.ncells).map((key) => ({
-			nMut: parseInt(key),
-			nCells: stdout.ncells[key],
-			nPop: stdout.npop[key],
-		}));
-		setDataPlot(data)
-
-		const output = [
-			data.reduce(
-				(acc, item) => {
-					acc[item.nMut.toString()] = item.nCells;
-					return acc;
-				},
-				{ name: 'mut' } as Record<string, number | string>
-			)
-		];
-
-		const series = Object.keys(output[0])
-			.filter((key) => key !== 'name')
-			.map((key) => ({
-				name: key,
-				color: 'red'
-			}));
-
-		setDataPlotStacked(output)
-		setSeries(series)
-
-	}
-
-	async function downloadPDF() {
-		const response = await fetch(`/api/download_pdf?frequence=${frequence}`);
-
-		if (!response.ok) {
-			throw new Error('Errore nel download del PDF');
-		}
-
-		const blob = await response.blob();
-		const url = window.URL.createObjectURL(blob);
-
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = `plot_download_${frequence}.pdf`;
-		document.body.appendChild(a);
-		a.click();
-		a.remove();
-
-		window.URL.revokeObjectURL(url);
-	}
 
 
 
@@ -317,200 +241,11 @@ export default function Home() {
 						</Group>
 					</GridCol>
 				</Grid>
-				{endAnalysis &&
-					<>
-						<h1>Your Simulation</h1>
-						<Text c={colorsPage.lightDescription} mb={"lg"}>
-							The simulation output is displayed directly as a Muller plot, showing the clonal dynamics of the tumor over time. Each area represents a subclone, evolving and expanding based on the rules you defined.
-							You can interact with the plot using the following tools:
-							Absolute/Relative Abundance Switch between total number of cells (absolute) and proportion of the tumor mass (relative)
-							Granularity Control: subclones below a threshold will be hidden to reduce visual noise and focus on significant populations. The zoom lets you adjust such threshold
-							Color Customization
-							Virtual Sequencing: select a specific time point to simulate a sequencing experiment
-						</Text>
-						<Grid align="center" justify="center">
-							<GridCol span={"content"}>
-								<ActionIcon variant="default" onClick={downloadPDF}>
-									<IconDownload />
-								</ActionIcon>
-							</GridCol>
-							<GridCol span={"content"}>
-								<SegmentedControl value={frequence} onChange={setFrequence} style={{ backgroundColor: '#ede8e8' }} data={[
-									{ label: 'Absolute Frequence', value: 'absolute' },
-									{ label: 'Relative Frequence', value: 'relative' }]} />
-							</GridCol>
-							<GridCol span={"content"}>
-								<ButtonGroup>
-									<Button disabled={changingDepth || depth <= 2} color={colorsAddButtonIcon} onClick={() => {
-										if (depth > 2) setDepth(depth - 1)
-									}} variant="default" size={"xs"} radius="md">
-										<IconMinus />
-									</Button>
-									<Button disabled={changingDepth || depth >= 4} color={colorsAddButtonIcon} onClick={() => {
-										if (depth < 4) setDepth(depth + 1)
-									}} variant="default" size={"xs"} radius="md" >
-										<IconPlus />
-									</Button>
-								</ButtonGroup>
-							</GridCol>
-							<GridCol span={"auto"}>
-								<Group justify="flex-end">
-									<Button color={"black"} variant="transparent" autoContrast onClick={() => setSequencing(!sequencing)} rightSection={
-										(!sequencing && <IconChevronDown size={"15px"} />) || (sequencing && <IconChevronUp size={"15px"} />)
-									}>
-										<Text size="lg" fw={600}>Sequencing</Text>
-									</Button>
-								</Group>
-							</GridCol>
-						</Grid>
-						<Stack mt={"xl"}>
-							<Grid>
-								<GridCol span={1}>
-									<Box
-										style={{
-											height: '100%',
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-										}}
-									>
-										<Box
-											style={{
-												transform: 'rotate(-90deg)',
-												transformOrigin: 'center',
-												whiteSpace: 'nowrap',
-											}}
-										>
-											<Text size="xl">{frequence === 'absolute' && <>Absolute</>} {frequence === 'relative' && <>Relative</>}Frequence</Text>
-										</Box>
-									</Box>
-								</GridCol>
-								<GridCol span={10}>
-									<div style={{ width: "100%", aspectRatio: "16/9", position: "relative" }}>
-										<LoadingOverlay visible={changingDepth} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
-										<Image
-											key={version}
-											src={`/api/image?v=${version}&frequence=${frequence}`}
-											alt="Analysis Result"
-											fill
-											sizes="100vw"
-											style={{ objectFit: "contain" }}
-											unoptimized
-										/>
-										{sequencing &&
-											<div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}>
-												<LineChart
-													gridAxis="none"
-													withXAxis={false}
-													withYAxis={false}
-													withDots={false}
-													withTooltip={false}
-													orientation="vertical"
-													yAxisProps={{ domain: [0, 100] }}
-													xAxisProps={{ domain: [0, 100] }}
-													data={[
-														{ date: "A", Apples: sliderValue },
-														{ date: "B", Apples: sliderValue }
-													]}
-													curveType="linear"
-													dataKey="date"
-													series={[
-														{ name: 'Apples', color: 'black' },
-													]}
-													style={{ width: "100%", height: "100%" }}
-												/>
-											</div>
-										}
-									</div>
-									{sequencing &&
-										<>
-											<Slider color={'black'} domain={[0, 100]} step={100 / savingCheckpoints} styles={{
-												bar: {
-													height: '1px',
-													width: '1px'
-												},
-												thumb: {
-													width: '12px',
-													height: '12px',
-													transform: `translateX(${thumbOffset}px) translateY(-5px)`,
-												},
-											}} label={null} value={sliderValue} onChange={setSliderValue} />
-
-											<div
-												style={{
-													transform: `translateX(${sliderPercent - 3.5}%)`,
-													transition: 'left 0.2s ease',
-													marginTop: "1%"
-												}}
-											>
-												<Button w="60px" loading={loadSequencing} color={"black"} onClick={getSequencing} autoContrast variant="filled">GO</Button>
-											</div>
-										</>
-									}
-								</GridCol>
-								<GridCol span={1}>
-									<div style={{ aspectRatio: "1/6.92", position: "relative" }}>
-										<Image
-											key={version}
-											src={arrow_image}
-											alt="Analysis Result"
-											fill
-										/>
-										<div
-											style={{
-												position: "absolute",
-												top: 0,
-												left: 0,
-												width: "100%",
-												height: "100%",
-												display: "flex",
-												alignItems: "center",
-												justifyContent: "center",
-												pointerEvents: "none",
-												fontSize: "1.2rem",
-											}}
-										>
-											<span
-												style={{
-													backgroundColor: colorsPage.background,
-													padding: "0.2em 0.4em",
-													borderRadius: "4px",
-													color: "black"
-												}}
-											>
-												{frequence === 'absolute' && (
-													<>
-														{base}&middot;10<sup>{exponent}</sup>
-													</>
-												)}
-												{frequence === 'relative' && (
-													<>
-														100%
-													</>
-												)}
-											</span>
-										</div>
-									</div>
-								</GridCol>
-							</Grid>
-
-							<Grid pos={"relative"} pt={"md"} pb={"md"} px={"md"}>
-								<LoadingOverlay visible={changingColor} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
-								{colors.map((c, index) => {
-									return (
-										<GridCol key={index} span="content">
-											<LabelledColorPicker label={c.label} c={c.color} />
-										</GridCol>
-									)
-								})}
-							</Grid>
-						</Stack>
-					</>
-				}
+				{endAnalysis && <SimulationResults />}
 				{sequenced && (
 					<Card mt={"lg"} shadow="sm"
 						padding="xl">
-						<h2>Sequencing at day {Math.floor(sliderValue / 100 * endingTime)}</h2>
+						<h2>Sequencing at day {sequencingDay}</h2>
 
 						<BarChart
 							mt={"md"}
