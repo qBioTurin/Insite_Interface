@@ -62,9 +62,9 @@ if(length(roots)>1){
 p<-get_tree_plot_app(composition)
 
 p
-ggsave(p,device = "pdf",
+ggsave(p,device = "png",
        path = path_out,
-       filename="plot_tree_sequenced.pdf")
+       filename="plot_tree_sequenced.png")
 
 
 tibble(unique_mut_id,ncells,nmut_in_gen)%>%
