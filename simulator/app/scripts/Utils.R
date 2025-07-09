@@ -742,13 +742,13 @@ get_tree_plot_app<-function(df,palette){
                      fill=fun_eff),
                  label="Mut1",
                  #size=1.5,
-                 size=size_label,
+                 size=10,
                  label.r =unit(0.5,"lines"),
                  label.size = 0)+
       xlim(-0.1,0.1)+
       ylim(-0.1,0.1)+
       coord_fixed()+
-      scale_fill_manual(values=c("#F7CE5B","#0CBABA","#A53860"),na.value = "white")+
+      #scale_fill_manual(values=c("#F7CE5B","#0CBABA","#A53860"),na.value = "white")+
       theme_void()+
       theme(legend.position = "none")
   }
