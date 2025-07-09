@@ -5,8 +5,9 @@ import { IconMinus, IconPlus } from "@tabler/icons-react";
 import PopulationCombobox from "./population-combobox";
 import { useStartingConditionsStore } from "@/lib/starting-conditions-store";
 import InputLabel from "./input-label";
+import { useFunctionalEventsStore } from "@/lib/functional-events-store";
 
-export default function StartingConditions({ functionalEvents }: { functionalEvents: Event[] }) {
+export default function StartingConditions() {
 	const {
 		addMutations,
 		updateNextMutationId,
@@ -15,11 +16,14 @@ export default function StartingConditions({ functionalEvents }: { functionalEve
 		addPopulation,
 		updatePopulationNumberCells,
 		removeMutation,
+		removePopulation,
 		nextPopulationId,
 		populations,
 		nextMutationId,
 		mutations
 	} = useStartingConditionsStore();
+
+	const { functionalEvents } = useFunctionalEventsStore();
 
 	function getEventTypeById(id: number, events: Event[]) {
 		return events.filter(e => e.id === id)[0].type
@@ -43,14 +47,21 @@ Use the interface to add as many initial populations as needed. The simulator wi
 							{populations.map((population, index) => {
 								return (
 									<Grid key={index} align="flex-end">
-										<GridCol span={2}>
+										<GridCol span={1}>
 											<Text>{population.name}</Text>
 										</GridCol>
-										<GridCol span={7}>
+										<GridCol span={6}>
 											<PopulationCombobox population={population} />
 										</GridCol>
 										<GridCol span={3}>
 											<NumberInput onChange={(val) => updatePopulationNumberCells(population, Number(val))} defaultValue={population.numberOfCells} label="Number of cells" hideControls />
+										</GridCol>
+										<GridCol span={2}>
+											<ActionIcon onClick={() => {
+												removePopulation(population)
+											}} autoContrast aria-label="Settings" radius={"xl"} color={colorsAddButton}>
+												<IconMinus style={{ width: '70%', height: '70%', color: colorsAddButtonIcon }} stroke={1.5} />
+											</ActionIcon>
 										</GridCol>
 									</Grid>
 								)

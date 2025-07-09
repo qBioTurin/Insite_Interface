@@ -1,7 +1,7 @@
 import { TreeNode } from "@/components/interfaces";
 import { useFunctionalEventsStore } from "./functional-events-store";
-import { useGeneralInformationStore } from "./general-information-store";
 import { useStartingConditionsStore } from "./starting-conditions-store";
+import { useSimulationStepStore } from "./general-information-store";
 
 function groupSets(sets: Set<string>[]): Set<string>[][] {
 	const groups: Set<string>[][] = [];
@@ -121,7 +121,7 @@ export function parseJson() {
 		mutableBases,
 		endingTime,
 		savingCheckpoints
-	} = useGeneralInformationStore.getState();
+	} = useSimulationStepStore.getState();
 
 	const {
 		mutations,

@@ -1,20 +1,24 @@
 'use client'
-import AdvancedInformation from "@/components/advanced-information";
 import FunctionalEvents from "@/components/functional-events";
-import GeneralInformation from "@/components/general-information";
 import { parseJson } from "@/lib/parse-json";
 import Image from 'next/image';
 
-import { Box, Button, ButtonGroup, Container, Divider, Grid, GridCol, Group, LoadingOverlay, SegmentedControl, Notification, Slider, Stack, Text, Progress } from "@mantine/core";
-import { useEffect, useRef, useState } from "react";
-import { IconChevronDown, IconChevronUp, IconMinus, IconPlayerPlayFilled, IconPlus } from "@tabler/icons-react";
+import { Box, Button, ButtonGroup, Container, Divider, Grid, GridCol, Group, LoadingOverlay, SegmentedControl, Slider, Stack, Text, Progress, ActionIcon, Card } from "@mantine/core";
+import React, { useEffect, useRef, useState } from "react";
+import { IconChevronDown, IconChevronUp, IconDownload, IconMinus, IconPlayerPlayFilled, IconPlus } from "@tabler/icons-react";
 import { colorsAddButtonIcon, colorsPage, colorsPicker, colorsRunButton } from "@/components/colors";
 import LabelledColorPicker from "@/components/labelledColorPicker";
 import parseColors from "@/lib/parse-colors";
 import { useColorsLegendStore } from "@/lib/colors-legend-store";
-import { LineChart } from "@mantine/charts";
+import { BarChart, LineChart } from "@mantine/charts";
 import arrow_image from '@/assets/side_plot_show.png'
 import { notifications } from "@mantine/notifications";
+import PopulationsHeatmap from "@/components/charts/populations-heatmap";
+import SequencingTable from "@/components/charts/sequencing-table";
+import { useStartingConditionsStore } from "@/lib/starting-conditions-store";
+import SimulationStep from "@/components/simulation-step";
+import { useSimulationStepStore } from "@/lib/general-information-store";
+import StartingConditions from "@/components/starting-conditions";
 
 export default function Home() {
 	const [endAnalysis, setEndAnalysis] = useState(false)
@@ -30,6 +34,11 @@ export default function Home() {
 	const [changingDepth, setChangingDepth] = useState(false)
 	const [error, setError] = useState(false)
 	const [percentage, setPercentage] = useState(0)
+	const [loadSequencing, setLoadSequencing] = useState(false)
+	const [sequenced, setSequenced] = useState(false)
+	const [dataPlot, setDataPlot] = useState<{ nMut: number, nCells: number, nPop: number }[]>([])
+	const [dataPlotStacked, setDataPlotStacked] = useState<Record<string, string | number>[]>([])
+	const [series, setSeries] = useState<{ name: string; color: string; }[]>([])
 
 	const { colors, addColor, resetColors, changeColor, updateChangingColor, changingColor } = useColorsLegendStore()
 	const thumbOffset = (0.17 * sliderValue) - 14
@@ -41,12 +50,16 @@ export default function Home() {
 		_colors.map((c, i) => addColor({ label: c.label, color: colorsPicker[i % 20] }))
 	}
 
+	const { savingCheckpoints, endingTime } = useSimulationStepStore()
+
+	const { populations } = useStartingConditionsStore()
+
 	const pollPercentageUntilComplete = async () => {
 		let isComplete = false
 
 		while (!isComplete) {
 			try {
-				const res = await fetch('/api/check_percentage', {
+				const res = await fetch(`/api/check_percentage?checkpoints=${savingCheckpoints}`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
@@ -72,6 +85,15 @@ export default function Home() {
 
 
 	const handleSubmit = async () => {
+		if (populations.length <= 0) {
+			notifications.show({
+				title: 'Error in starting populations',
+				message: 'You should have at least one population',
+				color: 'red'
+			})
+			return
+		}
+		setSequenced(false)
 		setEndAnalysis(false)
 		setLoading(true)
 		setPercentage(1)
@@ -122,7 +144,6 @@ export default function Home() {
 		})
 
 		const val = (await res2.json()).stdout
-		// console.log(val)
 		setBase(val.base)
 		setExponent(val.exponent)
 
@@ -150,7 +171,7 @@ export default function Home() {
 
 			addColorsStarting((await res.json())['stdout'])
 
-			const res2 = await fetch('/api/draw_plot', {
+			await fetch('/api/draw_plot', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -160,8 +181,6 @@ export default function Home() {
 					image: parseColors()
 				}),
 			});
-
-			const result = await res2.json();
 
 			setVersion(Date.now());
 			setEndAnalysis(true);
@@ -203,13 +222,81 @@ export default function Home() {
 		fetchData();
 	}, [changeColor])
 
+	async function getSequencing() {
+		setLoadSequencing(true)
+		const numSeq = sliderPercent * savingCheckpoints / 100
+		const res2 = await fetch(`/api/get_sequencing?numSeq=${numSeq}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+
+		const result = await res2.json();
+		console.log(result);
+		setLoadSequencing(false)
+		setSequenced(true)
+		const stdout = result.stdout;
+		const data: { nMut: number; nCells: number; nPop: number }[] = Object.keys(stdout.ncells).map((key) => ({
+			nMut: parseInt(key),
+			nCells: stdout.ncells[key],
+			nPop: stdout.npop[key],
+		}));
+		setDataPlot(data)
+
+		const output = [
+			data.reduce(
+				(acc, item) => {
+					acc[item.nMut.toString()] = item.nCells;
+					return acc;
+				},
+				{ name: 'mut' } as Record<string, number | string>
+			)
+		];
+
+		const series = Object.keys(output[0])
+			.filter((key) => key !== 'name')
+			.map((key) => ({
+				name: key,
+				color: 'red'
+			}));
+
+		setDataPlotStacked(output)
+		setSeries(series)
+
+	}
+
+	async function downloadPDF() {
+		const response = await fetch(`/api/download_pdf?frequence=${frequence}`);
+
+		if (!response.ok) {
+			throw new Error('Errore nel download del PDF');
+		}
+
+		const blob = await response.blob();
+		const url = window.URL.createObjectURL(blob);
+
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `plot_download_${frequence}.pdf`;
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+
+		window.URL.revokeObjectURL(url);
+	}
+
+
+
 	return (
 		<>
 			<Container mb={50}>
-				<GeneralInformation />
-				<AdvancedInformation />
+				{/* <SequencingTable /> */}
+				<SimulationStep />
 				<Divider my="md" />
 				<FunctionalEvents />
+				<Divider my="md" />
+				<StartingConditions />
 				<Divider my="md" />
 				<Grid justify="center" align="center">
 					<GridCol span={"auto"}>
@@ -232,28 +319,41 @@ export default function Home() {
 				</Grid>
 				{endAnalysis &&
 					<>
-						<h1>Results</h1>
-						<Grid align="center">
-							<GridCol span={4}>
+						<h1>Your Simulation</h1>
+						<Text c={colorsPage.lightDescription} mb={"lg"}>
+							The simulation output is displayed directly as a Muller plot, showing the clonal dynamics of the tumor over time. Each area represents a subclone, evolving and expanding based on the rules you defined.
+							You can interact with the plot using the following tools:
+							Absolute/Relative Abundance Switch between total number of cells (absolute) and proportion of the tumor mass (relative)
+							Granularity Control: subclones below a threshold will be hidden to reduce visual noise and focus on significant populations. The zoom lets you adjust such threshold
+							Color Customization
+							Virtual Sequencing: select a specific time point to simulate a sequencing experiment
+						</Text>
+						<Grid align="center" justify="center">
+							<GridCol span={"content"}>
+								<ActionIcon variant="default" onClick={downloadPDF}>
+									<IconDownload />
+								</ActionIcon>
+							</GridCol>
+							<GridCol span={"content"}>
 								<SegmentedControl value={frequence} onChange={setFrequence} style={{ backgroundColor: '#ede8e8' }} data={[
 									{ label: 'Absolute Frequence', value: 'absolute' },
 									{ label: 'Relative Frequence', value: 'relative' }]} />
 							</GridCol>
-							<GridCol span={3}>
+							<GridCol span={"content"}>
 								<ButtonGroup>
 									<Button disabled={changingDepth || depth <= 2} color={colorsAddButtonIcon} onClick={() => {
 										if (depth > 2) setDepth(depth - 1)
-									}} variant="outline" size={"xs"} radius="md">
+									}} variant="default" size={"xs"} radius="md">
 										<IconMinus />
 									</Button>
 									<Button disabled={changingDepth || depth >= 4} color={colorsAddButtonIcon} onClick={() => {
 										if (depth < 4) setDepth(depth + 1)
-									}} variant="outline" size={"xs"} radius="md" >
+									}} variant="default" size={"xs"} radius="md" >
 										<IconPlus />
 									</Button>
 								</ButtonGroup>
 							</GridCol>
-							<GridCol span={3} offset={2}>
+							<GridCol span={"auto"}>
 								<Group justify="flex-end">
 									<Button color={"black"} variant="transparent" autoContrast onClick={() => setSequencing(!sequencing)} rightSection={
 										(!sequencing && <IconChevronDown size={"15px"} />) || (sequencing && <IconChevronUp size={"15px"} />)
@@ -324,7 +424,7 @@ export default function Home() {
 									</div>
 									{sequencing &&
 										<>
-											<Slider color={'black'} domain={[0, 100]} styles={{
+											<Slider color={'black'} domain={[0, 100]} step={100 / savingCheckpoints} styles={{
 												bar: {
 													height: '1px',
 													width: '1px'
@@ -343,7 +443,7 @@ export default function Home() {
 													marginTop: "1%"
 												}}
 											>
-												<Button w="60px" color={"black"} autoContrast variant="filled">GO</Button>
+												<Button w="60px" loading={loadSequencing} color={"black"} onClick={getSequencing} autoContrast variant="filled">GO</Button>
 											</div>
 										</>
 									}
@@ -374,8 +474,8 @@ export default function Home() {
 												style={{
 													backgroundColor: colorsPage.background,
 													padding: "0.2em 0.4em",
-													borderRadius: "4px", // opzionale, per bordi arrotondati
-													color: "black" // assicura contrasto leggibile
+													borderRadius: "4px",
+													color: "black"
 												}}
 											>
 												{frequence === 'absolute' && (
@@ -396,7 +496,6 @@ export default function Home() {
 
 							<Grid pos={"relative"} pt={"md"} pb={"md"} px={"md"}>
 								<LoadingOverlay visible={changingColor} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
-
 								{colors.map((c, index) => {
 									return (
 										<GridCol key={index} span="content">
@@ -408,6 +507,27 @@ export default function Home() {
 						</Stack>
 					</>
 				}
+				{sequenced && (
+					<Card mt={"lg"} shadow="sm"
+						padding="xl">
+						<h2>Sequencing at day {Math.floor(sliderValue / 100 * endingTime)}</h2>
+
+						<BarChart
+							mt={"md"}
+							h={100}
+							data={dataPlotStacked}
+							tickLine="none"
+							gridAxis="none"
+							type="stacked"
+							orientation="vertical"
+							dataKey="name"
+							withYAxis={false}
+							series={series}
+							barProps={{ width: 20 }}
+						/>
+						<PopulationsHeatmap dataPlot={dataPlot} />
+					</Card>
+				)}
 			</Container>
 		</>
 	);

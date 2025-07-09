@@ -86,8 +86,8 @@ def draw_plot():
 @app.route("/check_percentage", methods=["GET"])
 def check_percentage():
     try:
+        total_expected = int(request.args.get("checkpoints"))
         folder_path = "/data/sim1" 
-        total_expected = 50
 
         num_files = len([f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))])
 
@@ -112,7 +112,11 @@ def download_file():
         return send_file(file_path, as_attachment=True)
     else:
         return {"error": "File not found"}, 404
-
+    
+@app.route('/download_pdf', methods=['GET'])
+def download_pdf():
+    frequence = request.args.get("frequence") if request.args.get("frequence") != '' else 'absolute'
+    return send_file(f'/data/plot_download_{frequence}.pdf', as_attachment=True)
 
 @app.route("/download_side_plot", methods=["GET"])
 def download_side_plot():
@@ -126,7 +130,25 @@ def download_side_plot():
         return send_file(file_path, as_attachment=True)
     else:
         return {"error": "File not found"}, 404
+    
+@app.route("/get_sequencing", methods=["GET"])
+def get_sequencing():
+    numSeq = request.args.get("numSeq")
+    try:
+        subprocess.run(
+            ["Rscript", "/app/scripts/get_sequencing.R", "/data", numSeq],
+            capture_output=True,
+            text=True
+        )
+        
+        with open("/data/seq_barplot_df.json", "r") as f:
+            data = json.load(f)
 
-
+        return jsonify({
+            "stdout": data,
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

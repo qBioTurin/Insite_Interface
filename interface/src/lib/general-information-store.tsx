@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface GeneralInformation {
+interface SimulationStep {
   cellLifeDays: number;
   carryingCapacity: number;
   mutationRate: number;
@@ -20,7 +20,7 @@ interface GeneralInformation {
   setThreads: (v: number) => void;
 }
 
-export const useGeneralInformationStore = create<GeneralInformation>((set) => ({
+export const useSimulationStepStore = create<SimulationStep>((set) => ({
   cellLifeDays: 4,
   carryingCapacity: 1e6,
   mutationRate: 8e-9,

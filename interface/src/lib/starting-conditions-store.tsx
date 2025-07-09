@@ -20,6 +20,7 @@ interface StartingConditions {
 	updatePopulationNumberCells: (population: Population, newNumberCells: number) => void;
 	addMutationToPopulation: (population: Population, mutation: string) => void;
 	removeMutationFromPopulation: (population: Population, mutation: string) => void;
+	removePopulation: (population: Population) => void;
 }
 
 export const useStartingConditionsStore = create<StartingConditions>((set) => ({
@@ -50,11 +51,12 @@ export const useStartingConditionsStore = create<StartingConditions>((set) => ({
 			mutations: state.mutations.filter(
 				(m) => mut.name !== m.name
 			),
-			populations: state.populations.map((p) => {return {...p, mutations: p.mutations.filter(m => mut.name !== m)}})
+			populations: state.populations.map((p) => { return { ...p, mutations: p.mutations.filter(m => mut.name !== m) } })
 		})),
 	resetMutations: () =>
-		set(() => ({
-			mutations: []
+		set((state) => ({
+			mutations: [],
+			populations: state.populations.map((p) => { return { ...p, mutations: [] } })
 		})),
 
 	addPopulation: (population) =>
@@ -82,5 +84,9 @@ export const useStartingConditionsStore = create<StartingConditions>((set) => ({
 			populations: state.populations.map((p) =>
 				population.id === p.id ? { ...population, mutations: population.mutations.filter(mut => mut !== mutation) } : p
 			)
+		})),
+	removePopulation: (population) =>
+		set((state) => ({
+			populations: state.populations.filter((p) => population.id !== p.id)
 		}))
 }));

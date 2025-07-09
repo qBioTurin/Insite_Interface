@@ -4,6 +4,7 @@ export const defaultEventParams = {
 	additionalSpace: 6,
 	susceptibility: 1,
 	offensiveScore: -0.5,
+	basePairsOfInterest: 5000
 };
 
 export const defaultStartingConditions = 5;

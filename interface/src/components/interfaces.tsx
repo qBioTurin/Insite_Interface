@@ -29,3 +29,9 @@ export interface TreeNode {
 	data: string;
 	children?: TreeNode[]
 }
+
+export interface PlotData {
+    nMut: number;
+    nCells: number;
+    nPop: number;
+}

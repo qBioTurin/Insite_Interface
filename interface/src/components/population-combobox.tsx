@@ -1,7 +1,6 @@
 'use client'
 import { CheckIcon, Combobox, ComboboxDropdownTarget, ComboboxEventsTarget, Group, Pill, PillGroup, PillsInput, PillsInputField, useCombobox } from "@mantine/core";
-import { useState } from "react";
-import { Mutation, Population } from "./interfaces";
+import { Population } from "./interfaces";
 import { colorsPills } from "./colors";
 import { useStartingConditionsStore } from "@/lib/starting-conditions-store";
 
@@ -11,7 +10,6 @@ export default function PopulationCombobox({ population }: { population: Populat
 		removeMutationFromPopulation,
 		mutations
 	} = useStartingConditionsStore();
-	// const [values, setValues] = useState<string[]>(population.mutations);
 
 	const combobox = useCombobox({
 		onDropdownClose: () => combobox.resetSelectedOption(),
@@ -20,14 +18,10 @@ export default function PopulationCombobox({ population }: { population: Populat
 
 	const handleValueSelect = (val: string) => {
 		addMutationToPopulation(population, mutations.filter((mut) => mut.name === val)[0].name)
-		// setValues((current) =>
-		// 	current.includes(val) ? current.filter((v) => v !== val) : [...current, val]
-		// );
 	}
 
 	const handleValueRemove = (val: string) => {
 		removeMutationFromPopulation(population, mutations.filter((mut) => mut.name === val)[0].name)
-		// setValues((current) => current.filter((v) => v !== val));
 	}
 
 	const options = mutations
