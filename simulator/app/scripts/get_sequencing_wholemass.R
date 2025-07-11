@@ -90,5 +90,4 @@ table_pops<-tibble(pop_id=1:length(pop),mut=unique_mut_id,fun_eff)%>%
   group_by(nmut)%>%
   summarise(pop_names=list(mut_names),fun_eff=list(fun_eff),ncells=list(ncells))
 
-write(toJSON(table_pops),file = paste(path_out,"table_pops.json",sep="/"))
-
+write(jsonlite::toJSON(table_pops,auto_unbox = FALSE),file = paste(path_out,"table_pops.json",sep="/"))
