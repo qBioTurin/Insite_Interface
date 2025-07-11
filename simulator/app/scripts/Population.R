@@ -28,6 +28,17 @@ setMethod("phenotype",
             return(sort(Population@phenotype))
           })
 
+setGeneric("is_equal_pop",function(Population1,Population2) standardGeneric("is_equal_pop"))
+setMethod("is_equal_pop",
+          signature("Population",
+                    "Population"),
+          function(Population1,Population2){
+            gen1<-genotype(Population1)
+            gen2<-genotype(Population2)
+            if(length(gen1)!=length(gen2)){return(FALSE)}
+            else{return(all(gen1==gen2))}
+          })
+
 setGeneric("parent",function(Population) stantardGeneric("parent"))
 setMethod("parent",
           "Population",

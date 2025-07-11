@@ -6,13 +6,14 @@ source("scripts/Population_with_size_nmut.R")
 
 args<-commandArgs(trailingOnly = TRUE)
 if(interactive()){
-  args <- c("raw",30,"output")
+  args <- c("raw",20,"output")
 }
 path_in<-args[1]
 path_out<-args[3]
 
 load(paste(path_in,"/Parameters.RData",sep=""))
 load(paste(path_in,"mut_names_tbl.RData",sep="/"))
+
 
 num_seq<-as.numeric(args[2])
 Nexp<-1
@@ -191,5 +192,6 @@ p<-plot_show_absolute+
             color="black",
             linetype = 2,
             linewidth = 0.5)
+p
 
 ggsave(plot=p,filename = "zoom_sequence_plot.png",device = "png",width = 5,height = 5,path = path_out)

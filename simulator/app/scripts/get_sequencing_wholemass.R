@@ -6,7 +6,7 @@ source("scripts/Population_with_size_nmut.R")
 
 args<-commandArgs(trailingOnly = TRUE)
 if(interactive()){
-  args <- c("raw",30,"output")
+  args <- c("raw",20,"output")
 }
 path_in<-args[1]
 path_out<-args[3]
@@ -38,7 +38,7 @@ used_nums<-as.numeric(gsub(pattern = "Mut",x = names(mut_names),replacement = ""
 mut_nums<-1:length(all_mut)
 not_used_mut_nums<-mut_nums[!mut_nums%in%used_nums]
 mut_names_tbl<-tibble(mut=c(mut_names,all_mut[!all_mut%in%mut_names]),
-                      names=c(names(mut_names),paste0("Mut",not_used_mut_nums,sep="")))
+                      names=c(names(mut_names),paste0("Mut",not_used_mut_nums,sep="",recycle0 = TRUE)))
 
 save(mut_names_tbl,file=paste(path_in,"mut_names_tbl.RData",sep="/"))
 pop_nmut<-tibble(ncells=sapply(split(ncells,nmut_in_gen), sum),
