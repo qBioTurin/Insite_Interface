@@ -117,11 +117,18 @@ parameters<-new("Parameters",
                 av_lifespan=av_lifespan
                 )
 
+palette<-sapply(json_data$functionalEvents,function(event){event$color})
+names(palette)<-names(functional_effects)
+
+mut_names<-unlist(json_data$mutations)
+
 save(list=c("parameters",
             "starting_gen",
             "starting_fun_eff",
             "Ncells_start",
-            "tmax"),
+            "tmax",
+            "palette",
+            "mut_names"),
      file = paste(path,"/Parameters.RData",sep="")
      )
 rm(list=ls())

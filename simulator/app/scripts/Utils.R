@@ -736,11 +736,11 @@ elbowed_link<-function(x1,y1,x2,y2,r,x_mean){
 
 get_tree_plot_app<-function(df,palette){
   if(nrow(df)==1){
-    wanted_mut<-"1"
+    wanted_mut<-df$mut
     plot<-ggplot(df)+
       geom_label(aes(x=0,y=0,label="Mut1",
                      fill=fun_eff),
-                 label="Mut1",
+                 label=df$names,
                  #size=1.5,
                  size=10,
                  label.r =unit(0.5,"lines"),
@@ -748,7 +748,7 @@ get_tree_plot_app<-function(df,palette){
       xlim(-0.1,0.1)+
       ylim(-0.1,0.1)+
       coord_fixed()+
-      #scale_fill_manual(values=c("#F7CE5B","#0CBABA","#A53860"),na.value = "white")+
+      scale_fill_manual(values=palette,na.value = "white")+
       theme_void()+
       theme(legend.position = "none")
   }
@@ -784,7 +784,8 @@ get_tree_plot_app<-function(df,palette){
     
     mut_info<-df%>%
       filter(mut%in%wanted_mut)%>%
-      mutate(label=paste("mut",row_number(),sep=""))%>%
+      mutate(label=names)%>%
+        #label=paste("mut",row_number(),sep=""))%>%
       dplyr::select(mut,parents,label,fun_eff,mut_generation)%>%
       bind_rows(mut_info)
 
@@ -855,7 +856,7 @@ get_tree_plot_app<-function(df,palette){
       xlim(x_lim)+
       ylim(y_lim)+
       coord_fixed()+
-      scale_fill_manual(values=c("#F7CE5B","#0CBABA","#A53860"),na.value = "white")+
+      scale_fill_manual(values=palette,na.value = "white")+
       theme_void()+
       theme(legend.position = "none")
   }

@@ -28,11 +28,11 @@ Clones_df_relative<-get_muller_plot_info(obs_Pop_ID = obs_tumor$obs_Pop_ID,
                                          freq = TRUE,
                                          functional_effects = parameters@functional_effects)
 
-save(Clones_df_relative,file=paste(path_in,"Clones_df_relative.RData",sep="/"))
-
 plot_show_absolute<-get_muller_plot_show(Clones_df = Clones_df_absolute,
                                 freq = FALSE,
                                 palette = palette)
+
+save(plot_show_absolute,Clones_df_absolute,file=paste(path_in,"Clones_df_absolute.RData",sep="/"))
 
 ggsave(plot_show_absolute,device = "png",
        path = path_out,
