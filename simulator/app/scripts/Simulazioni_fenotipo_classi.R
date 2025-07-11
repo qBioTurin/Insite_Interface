@@ -1,6 +1,6 @@
 epsilon_rel<-10^(-3) # errore massimo concesso a ogni step
 
-simulazione<-function(Nexp,seed=.Random.seed,path,starting_gen,starting_fun_eff,Ncells_start,parameters,tmax,Ncellsmax){
+simulazione<-function(Nexp,seed,path,starting_gen,starting_fun_eff,Ncells_start,parameters,tmax,Ncellsmax){
   tryCatch(expr = {
     set.seed(seed)
     if(length(starting_fun_eff)!=length(starting_gen)){stop("Check genotype and functional effect association")}

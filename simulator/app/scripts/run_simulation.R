@@ -7,7 +7,6 @@ source("scripts/Local_Params.R")
 source("scripts/Population_with_size_nmut.R")
 source("scripts/Simulazioni_fenotipo_classi.R")
 
-runif(1)
 args<-commandArgs(trailingOnly = TRUE)
 if(interactive()){
   args <- c("params.json","raw")
@@ -16,7 +15,8 @@ if(interactive()){
 json_data <- fromJSON(file=args[1])
 path<-args[2]
 if(length(args)==2){
-  seed_selected<-.Random.seed
+  runif(1)
+  seed_selected<-as.integer(Sys.time())
 }else{
   seed_selected<- args[3]
 }

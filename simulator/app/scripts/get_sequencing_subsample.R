@@ -12,7 +12,7 @@ path_in<-args[1]
 path_out<-args[3]
 
 load(paste(path_in,"/Parameters.RData",sep=""))
-load(paste(path_in,"mut_names_tbl.RData"))
+load(paste(path_in,"mut_names_tbl.RData",sep="/"))
 
 num_seq<-as.numeric(args[2])
 Nexp<-1
