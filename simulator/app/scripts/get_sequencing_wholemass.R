@@ -40,7 +40,7 @@ not_used_mut_nums<-mut_nums[!mut_nums%in%used_nums]
 mut_names_tbl<-tibble(mut=c(mut_names,all_mut[!all_mut%in%mut_names]),
                       names=c(names(mut_names),paste0("Mut",not_used_mut_nums,sep="")))
 
-save(mut_names_tbl,file=paste(path_in,"mut_names_tbl.RData"))
+save(mut_names_tbl,file=paste(path_in,"mut_names_tbl.RData",sep="/"))
 pop_nmut<-tibble(ncells=sapply(split(ncells,nmut_in_gen), sum),
        npop=table(nmut_in_gen))
 
