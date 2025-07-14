@@ -21,6 +21,8 @@ if(length(args)==2){
   seed_selected<- args[3]
 }
 
+write(seed_selected,file=paste(path,"/seed.txt",sep=""))
+
 load(paste(path,"/Parameters.RData",sep=""))
 Nexp<-1
 
