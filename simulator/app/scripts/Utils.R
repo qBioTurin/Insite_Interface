@@ -743,7 +743,7 @@ get_tree_plot_app<-function(df,palette){
       geom_label(aes(x=0,y=y,label=names,
                      fill=fun_eff),
                  label=df$names,
-                 #size=1.5,
+                 color="white",
                  size=6,
                  label.r =unit(0.5,"lines"),
                  label.size = 0)+
@@ -825,7 +825,7 @@ get_tree_plot_app<-function(df,palette){
         geom_label(data=nodes_coord,
                    aes(x=x,y=y,label=label,
                        fill=fun_eff),
-                   #size=1.5,
+                   color="white",
                    size=size_label,
                    label.r =unit(0.5,"lines"),
                    label.size = 0)+
@@ -876,7 +876,7 @@ get_tree_plot_app<-function(df,palette){
       geom_label(data=nodes_coord,
                  aes(x=x,y=y,label=label,
                      fill=fun_eff),
-                 #size=1.5,
+                 color="white",
                  size=size_label,
                  label.r =unit(0.5,"lines"),
                  label.size = 0)+
