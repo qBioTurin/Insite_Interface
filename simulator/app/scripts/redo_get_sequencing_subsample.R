@@ -67,7 +67,7 @@ vcf_sample<-Clones_df_seq%>%
 
 
 
-write(toJSON(vcf_sample),file=paste(path_out,"vcf_sampled.json",sep="/"))
+write(jsonlite::toJSON(vcf_sample,auto_unbox = FALSE),file=paste(path_out,"vcf_sampled.json",sep="/"))
 
 load(paste(path_in,"Clones_df_absolute.RData",sep="/"))
 
