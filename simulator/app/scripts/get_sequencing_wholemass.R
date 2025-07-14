@@ -66,7 +66,9 @@ write(toJSON(hist_df),file = paste(path_in,"seq_hist_df.json",sep="/"))
 hist_plot<-ggplot(hist_df)+
   geom_histogram(aes(x=frequency),fill="#AFABAB")+
   theme_void()+
+  xlim(-0.05,1.05)+
   theme(axis.text.x = element_text(color="black"))
+
 ggsave(hist_plot,device = "png",
        path = path_out,
        height = 3,
@@ -77,6 +79,7 @@ hist_plot_fun_eff<-ggplot(hist_df)+
   geom_histogram(aes(x=frequency,fill=fun_eff))+
   theme_void()+
   scale_fill_manual(values=palette)+
+  xlim(-0.05,1.05)+
   theme(legend.position = "none",
         axis.text.x = element_text(color="black"))
 ggsave(hist_plot_fun_eff,device = "png",
