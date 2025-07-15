@@ -15,7 +15,7 @@ json_palette<-fromJSON(file=json_palette_file)
 palette<-sapply(json_palette,function(el){el$color})
 names(palette)<-sapply(json_palette,function(el){el$label})
 
-if(args[5]){
+if(as.logical(args[5])){
   seed_selected<- as.numeric(read.table(paste(path_in,"/seed_seq.txt",sep="")))
 }else{
   runif(1)
