@@ -13,6 +13,7 @@ interface Sequencing {
 
 	numSeq: number;
 	subsampleVersion: number;
+	vcfObjects: { fun_eff: string, sample_DP: number, sample_AD: number, VAF: number, mut: string }[];
 
 	setSequenced: (newSequenced: boolean) => void;
 	setSequencingDay: (newSequencingDay: number) => void;
@@ -24,6 +25,7 @@ interface Sequencing {
 	updatePlotVersion: () => void;
 	setNumSeq: (newNumSeq: number) => void;
 	updateSubsampleVersion: () => void;
+	setVCFObjects: (newVCFObjects: { fun_eff: string, sample_DP: number, sample_AD: number, VAF: number, mut: string }[]) => void;
 }
 
 export const useSequencingStore = create<Sequencing>((set) => ({
@@ -37,6 +39,7 @@ export const useSequencingStore = create<Sequencing>((set) => ({
 
 	plotVersion: 0,
 	subsampleVersion: 0,
+	vcfObjects: [],
 
 	setSequenced: (newSequenced: boolean) => set(() => ({ sequenced: newSequenced })),
 	setSequencingDay: (newSequencingDay: number) => set(() => ({ sequencingDay: newSequencingDay })),
@@ -52,5 +55,8 @@ export const useSequencingStore = create<Sequencing>((set) => ({
 	})),
 	updateSubsampleVersion: () => set((state) => ({
 		subsampleVersion: state.subsampleVersion + 1
-	}))
+	})),
+	setVCFObjects: (newVCFObjects) => set({
+		vcfObjects: newVCFObjects
+	})
 }));

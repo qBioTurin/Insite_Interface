@@ -40,7 +40,9 @@ export function CardMutation({ event, removeEvent, updateEventName, updateEventP
 			<Text mt="md" size="sm" mb={"xs"}>
 				Mutational amplification factor:
 			</Text>
-			<Slider mb="md" onChange={(value) => updateEventParam(event, "mutationalAmplificationFactor", value)} color={colors.mutation} value={event.params?.mutationalAmplificationFactor} min={0} max={2} scale={(v: number) => 10 ** v} step={0.1} restrictToMarks label={(value) => value.toFixed(0)} marks={[
+			<Slider mb="md" onChange={(value) =>
+				updateEventParam(event, "mutationalAmplificationFactor", 10 ** value)
+			} color={colors.mutation} value={Math.log10(event.params?.mutationalAmplificationFactor ?? 1)} min={0} max={2} step={0.1} restrictToMarks label={(value) => `${Math.round(10 ** value).toFixed(0)}`} marks={[
 				{ value: Math.log10(1), label: '1' },
 				{ value: Math.log10(2), label: '2' },
 				{ value: Math.log10(3) },

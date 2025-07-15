@@ -29,6 +29,7 @@ export default function Home() {
 	const { sequenced, setSequenced } = useSequencingStore()
 
 	const { depth, updateImageVersion, setPlotBase, setPlotExponent, updateChangingDepth } = useSimulationPlotOptionsStore()
+	const { seed } = useSimulationStepStore()
 
 
 	function addColorsStarting(_colors: { color: string, label: string }[]) {
@@ -90,7 +91,7 @@ export default function Home() {
 					'Content-Type': 'application/json',
 				},
 			})
-			const proxyResponsePromise = fetch('/api/proxy', {
+			const proxyResponsePromise = fetch(`/api/proxy?seed=${seed ?? ''}`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -195,9 +196,6 @@ export default function Home() {
 				}),
 			});
 
-			const result = await res2.json();
-			console.log(result);
-
 			updateImageVersion()
 			setEndAnalysis(true);
 			setLoading(false);
@@ -213,7 +211,6 @@ export default function Home() {
 	return (
 		<>
 			<Container mb={50}>
-				
 				<SimulationStep />
 				<Divider my="md" />
 				<FunctionalEvents />

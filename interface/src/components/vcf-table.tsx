@@ -1,22 +1,23 @@
+import { useSequencingStore } from "@/lib/sequencing-store";
 import { Table } from "@mantine/core";
 
 export default function VCFTable() {
 
-	const elements = [{ "fun_eff": "Growth1", "sample_DP": 127, "sample_AD": 65, "VAF": 0.5118, "mut": "Mut1" }]
+	const { vcfObjects } = useSequencingStore()
 
-	const rows = elements.map((element) => (
-		<Table.Tr key={element.mut}>
-			<Table.Td>{element.mut}</Table.Td>
-			<Table.Td>{element.sample_DP}</Table.Td>
-			<Table.Td>{element.sample_AD}</Table.Td>
-			<Table.Td>{element.VAF}</Table.Td>
-			<Table.Td>{element.fun_eff}</Table.Td>
+	const rows = vcfObjects.map((vcfObject) => (
+		<Table.Tr key={vcfObject.mut}>
+			<Table.Td>{vcfObject.mut}</Table.Td>
+			<Table.Td>{vcfObject.sample_DP}</Table.Td>
+			<Table.Td>{vcfObject.sample_AD}</Table.Td>
+			<Table.Td>{vcfObject.VAF}</Table.Td>
+			<Table.Td>{vcfObject.fun_eff}</Table.Td>
 		</Table.Tr>
 	));
 	return (
 		<Table highlightOnHover withColumnBorders>
 			<Table.Thead>
-				<Table.Tr style={{backgroundColor: 'black', color: 'white'}}>
+				<Table.Tr style={{ backgroundColor: 'black', color: 'white' }}>
 					<Table.Th colSpan={5} style={{ textAlign: "center", fontWeight: "bold", fontSize: "1.2rem" }}>
 						VCF
 					</Table.Th>

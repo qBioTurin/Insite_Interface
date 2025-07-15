@@ -24,7 +24,7 @@ export default function SequencingTable() {
 			</Grid>
 			{dataTableMut.map((row, index) => {
 				return (
-					<Grid key={index} mt="md" columns={24}>
+					<Grid key={index} columns={24}>
 						<GridCol span={2} py={"lg"}>
 							<Box
 								p="lg"

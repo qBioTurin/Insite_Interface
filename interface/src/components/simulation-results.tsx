@@ -2,7 +2,7 @@ import { ActionIcon, Box, Button, ButtonGroup, Grid, GridCol, Group, LoadingOver
 import { IconChevronDown, IconChevronUp, IconDownload, IconMinus, IconPlus } from "@tabler/icons-react"
 import Image from "next/image"
 import LabelledColorPicker from "./labelledColorPicker"
-import { colorMutTable, colorsAddButtonIcon, colorsPage, colorsPicker } from "./colors"
+import { colorMutTable, colorsAddButtonIcon, colorsPage } from "./colors"
 import { useState } from "react"
 import { useSimulationPlotOptionsStore } from "@/lib/simulation-plot-options"
 import { LineChart } from "@mantine/charts"

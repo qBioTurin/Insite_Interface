@@ -19,6 +19,7 @@ def clean_data():
 @app.route("/run-r", methods=["POST"])
 def run_r_script():
     try:
+        seed = request.args.get("seed") or ""
         param = request.json
 
         os.makedirs("/data", exist_ok=True)
@@ -27,11 +28,19 @@ def run_r_script():
         with open("/data/params.json", "w") as f:
             json.dump(param, f, indent=4)
 
-        subprocess.run(
+        if seed == '' :
+           subprocess.run(
             ["Rscript", "/app/scripts/run_simulation.R", "/data/params.json", "/data"],
             capture_output=True,
             text=True
         )
+        else:
+           subprocess.run(
+            ["Rscript", "/app/scripts/run_simulation.R", "/data/params.json", "/data", seed],
+            capture_output=True,
+            text=True
+        )
+           
         return jsonify({
             "stdout": param,
         })
@@ -181,9 +190,12 @@ def get_sequencing_subsample():
             capture_output=True,
             text=True
         )
+        
+        with open("/data/vcf_sampled.json", "r") as f:
+            data = json.load(f)
 
         return jsonify({
-            "ok": 'okt'
+            "data": data
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500

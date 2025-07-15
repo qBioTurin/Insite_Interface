@@ -1,5 +1,5 @@
 'use client'
-import { Accordion, AccordionControl, AccordionItem, AccordionPanel, Grid, GridCol, Group, NumberInput, Text } from "@mantine/core";
+import { Accordion, AccordionControl, AccordionItem, AccordionPanel, Grid, GridCol, Group, NumberInput, Text, TextInput } from "@mantine/core";
 import InputLabel from "./input-label";
 import { colorsPage } from "./colors";
 import { useSimulationStepStore } from "@/lib/simulation-step-store";
@@ -13,13 +13,15 @@ export default function SimulationStep() {
 		mutableBases,
 		savingCheckpoints,
 		threads,
+		seed,
 		setCellLifeDays,
 		setCarryingCapacity,
 		setMutationRate,
 		setMutableBases,
 		setEndingTime,
 		setSavingCheckpoints,
-		setThreads
+		setThreads,
+		setSeed
 	} = useSimulationStepStore();
 
 	const generalInputs = [
@@ -67,7 +69,7 @@ export default function SimulationStep() {
 			tooltip: "The number of CPU threads to allocate for running the simulation. Increasing this can speed up execution, especially for large-scale simulations, depending on your machine's capabilities.",
 			value: threads,
 			onChange: setThreads,
-		},
+		}
 	]
 
 	return (
@@ -109,6 +111,20 @@ export default function SimulationStep() {
 									/>
 								</GridCol>
 							))}
+							<GridCol span={6}>
+								<NumberInput
+									label={<InputLabel label={'Seed'} tooltip={"Enter a number to set the random seed for the simulation. Using the same seed will produce the same results, allowing reproducibility. Leave blank for a different random outcome each time."} />}
+									value={seed}
+									hideControls
+									onChange={(val) => {
+										if (val === '' || val === null) {
+											setSeed('');
+										} else {
+											setSeed(Number(val));
+										}
+									}}
+								/>
+							</GridCol>
 						</Grid>
 					</AccordionPanel>
 				</AccordionItem>
