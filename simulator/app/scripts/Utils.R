@@ -784,7 +784,7 @@ get_tree_plot_app<-function(df,palette){
       mutate(mut=paste(parents,"n",sep="_"),
              label=paste(ndaught_hidden,"more"),
              fun_eff=as.character(NA),
-             mut_generation=df$mut_generation[df$mut==parents]+1)%>%
+             mut_generation=unique(df$mut_generation[df$mut==parents])+1)%>%
       dplyr::select(mut,parents,label,mut_generation,fun_eff)%>%
       ungroup()
     
@@ -806,7 +806,7 @@ get_tree_plot_app<-function(df,palette){
     layout_df<-layout_df%>%
       filter(name!=0)%>%
       rowwise()%>%
-      mutate(y=x_grid-mut_info$mut_generation[mut_info$mut==name])%>%
+      mutate(y=x_grid-unique(mut_info$mut_generation[mut_info$mut==name]))%>%
       ungroup()
     
     nodes_coord<-tibble(x=rescale(-layout_df$y,to=x_range),
@@ -841,8 +841,6 @@ get_tree_plot_app<-function(df,palette){
         theme(legend.position = "none")
     }
     else{
-    
-    
     
     mid_pts<-unique(nodes_coord$x)+x_range[2]/x_grid
     
