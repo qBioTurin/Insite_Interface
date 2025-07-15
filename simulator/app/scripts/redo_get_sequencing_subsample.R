@@ -10,10 +10,6 @@ if(interactive()){
 }
 path_in<-args[1]
 path_out<-args[3]
-json_palette_file<-args[4]
-json_palette<-fromJSON(file=json_palette_file)
-palette<-sapply(json_palette,function(el){el$color})
-names(palette)<-sapply(json_palette,function(el){el$label})
 
 if(as.logical(args[5])){
   seed_selected<- as.numeric(read.table(paste(path_in,"/seed_seq.txt",sep="")))
@@ -27,6 +23,11 @@ set.seed(seed_selected)
 load(paste(path_in,"/Parameters.RData",sep=""))
 load(paste(path_in,"mut_names_tbl.RData",sep="/"))
 
+
+json_palette_file<-args[4]
+json_palette<-fromJSON(file=json_palette_file)
+palette<-sapply(json_palette,function(el){el$color})
+names(palette)<-sapply(json_palette,function(el){el$label})
 
 num_seq<-as.numeric(args[2])
 Nexp<-1
