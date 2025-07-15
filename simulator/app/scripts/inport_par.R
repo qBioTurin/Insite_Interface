@@ -103,7 +103,7 @@ if(length(k)>0){
   K<-rowSums(K)+rep(K_base,L)
 }
 
-print_time<-seq(from=0,to=tmax,by=tmax/Np)[-1]
+print_time<-round(seq(from=0,to=tmax, length.out = Np+1), 1)
 
 parameters<-new("Parameters",
                 functional_effects=functional_effects,
