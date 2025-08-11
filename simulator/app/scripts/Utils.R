@@ -112,33 +112,37 @@ setMethod("get_muller_plot_info",
                                   ]
                                 })
               
-              
-              daughters<-lapply(pop,
-                                function(p){
-                                  Pop_ID[
-                                    sapply(pop,
-                                           function(p1){
-                                             is_parent(p1,p)
-                                           })
-                                  ]
-                                })
-              
-              n_sons<-tibble(Population_ID=obs_Pop_ID$Population_ID,n=lengths(daughters))
-              
+
               fun_eff<-sapply(pop,function(p){
                 paste(names(functional_effects[sort(p@phenotype)]),collapse = ", ")
               })
               
               
-              daughters_ordered<-lapply(daughters,
-                                        function(d){
-                                          time_of_appearance%>%
-                                            filter(Population_ID%in%d)%>%
-                                            arrange(time_of_appearance)%>%
-                                            pull(Population_ID)
+              parent<-sapply(pop,
+                             function(p){
+                               anc<-Pop_ID[
+                                 sapply(pop,
+                                        function(p1){
+                                          is_descendant(p,p1)
                                         })
-              daughters_ordered_tbl<-tibble(Population_ID=obs_Pop_ID$Population_ID,daughters=daughters_ordered)
+                               ]
+                               
+                               return(anc[length(anc)-1])
+                             })
               
+              daughters_ordered_tbl<-tibble(pop=Pop_ID,Population_ID=as.vector(parent))%>%
+                filter(lengths(Population_ID)>0)%>%
+                group_by(Population_ID)%>%
+                summarise(daughters=list(pop))
+              
+              daughters_ordered_tbl$daughters<-sapply(daughters_ordered_tbl$daughters, function(d){
+                time_of_appearance%>%
+                  filter(Population_ID%in%d)%>%
+                  arrange(time_of_appearance)%>%
+                  pull(Population_ID)
+              })
+              
+              pop_with_sons<-unlist(daughters_ordered_tbl$Population_ID)
               
               if(freq==FALSE){
                 obs_tumor_tibble_clones<-tibble(Population_ID=Pop_ID,ancestors)%>%
@@ -154,8 +158,7 @@ setMethod("get_muller_plot_info",
                 
                 
                 root<-unlist(ancestors[lengths(ancestors)==1])
-                pop_with_sons<-n_sons$Population_ID[n_sons$n>0]
-                
+
                 if(length(root)>1){
                   obs_tumor_tibble_clones<-bind_rows(
                     obs_tumor_tibble_clones%>%
@@ -165,8 +168,7 @@ setMethod("get_muller_plot_info",
                                 Ncells_clone=sum(Ncells_clone),
                                 fun_eff=NA),
                     obs_tumor_tibble_clones)
-                  pop_with_sons<-c(0,n_sons$Population_ID[n_sons$n>0])
-                  daughters_ordered<-append(list(root),daughters_ordered)
+                  pop_with_sons<-c(0,pop_with_sons)
                   daughters_ordered_tbl<-bind_rows(tibble(Population_ID=0,
                                                           daughters=list(root)),daughters_ordered_tbl)
                   root<-0
@@ -254,8 +256,7 @@ setMethod("get_muller_plot_info",
                   left_join(tibble(clone=Pop_ID,fun_eff))
                 
                 root<-unlist(ancestors[lengths(ancestors)==1])
-                pop_with_sons<-n_sons$Population_ID[n_sons$n>0]
-                
+
                 if(length(root)>1){
                   obs_tumor_tibble_clones<-bind_rows(
                     tibble(clone=0,
@@ -263,8 +264,7 @@ setMethod("get_muller_plot_info",
                            Fcells_clone=1,
                            fun_eff="competition"),
                     obs_tumor_tibble_clones)
-                  pop_with_sons<-c(0,n_sons$Population_ID[n_sons$n>0])
-                  daughters_ordered<-append(list(root),daughters_ordered)
+                  pop_with_sons<-c(0,pop_with_sons)
                   daughters_ordered_tbl<-bind_rows(tibble(Population_ID=0,
                                                           daughters=list(root)),daughters_ordered_tbl)
                   root<-0
