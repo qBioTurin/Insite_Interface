@@ -51,8 +51,6 @@ load(paste(path_in,"/Parameters.RData",sep=""))
 
 Nexp<-opt$Nexp
 
-write(opt$seed,file=paste(path_in,"/seed.txt",sep=""))
-
 simulazione(Nexp=Nexp,
             seed=opt$seed,
             path = path_out,
