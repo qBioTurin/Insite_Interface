@@ -32,6 +32,9 @@ K_base<-json_data$carryingCapacity
 tmax<-json_data$endingTime
 Np<-json_data$savingCheckpoints
 av_lifespan<-json_data$cellLife
+Ncellsmax<-json_data$endingSize
+save_day<-json_data$savingFrequency
+
 mut_rate_base<-json_data$mutationRate
 
 functional_effects<-sapply(json_data$functionalEvents,
@@ -123,7 +126,11 @@ if(length(k)>0){
   K<-rowSums(K)+rep(K_base,L)
 }
 
-print_time<-round(seq(from=0,to=tmax, length.out = Np+1), 4)[-1]
+if(!is.null(tmax)){
+  print_time<-round(seq(from=0,to=tmax, length.out = Np+1), 4)[-1]
+}else{
+  print_time<-cumsum(rep(save_day,floor(50*365/save_day)))
+}
 
 parameters<-new("Parameters",
                 functional_effects=functional_effects,
@@ -147,6 +154,7 @@ save(list=c("parameters",
             "starting_fun_eff",
             "Ncells_start",
             "tmax",
+            "Ncellsmax",
             "palette",
             "mut_names"),
      file = paste(path,"/Parameters.RData",sep="")

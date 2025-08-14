@@ -6,7 +6,7 @@ source("scripts/Population_with_size_nmut.R")
 
 args<-commandArgs(trailingOnly = TRUE)
 if(interactive()){
-  args <- c("raw",4)
+  args <- c("raw",2)
 }
 path<-args[1]
 depth<-10^{-as.numeric(args[2])}

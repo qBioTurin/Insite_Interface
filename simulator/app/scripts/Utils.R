@@ -135,7 +135,7 @@ setMethod("get_muller_plot_info",
                 group_by(Population_ID)%>%
                 summarise(daughters=list(pop))
               
-              daughters_ordered_tbl$daughters<-sapply(daughters_ordered_tbl$daughters, function(d){
+              daughters_ordered_tbl$daughters<-lapply(daughters_ordered_tbl$daughters, function(d){
                 time_of_appearance%>%
                   filter(Population_ID%in%d)%>%
                   arrange(time_of_appearance)%>%

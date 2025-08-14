@@ -5,9 +5,9 @@ simulazione<-function(Nexp,seed,path,starting_gen,starting_fun_eff,Ncells_start,
     set.seed(seed+Nexp)
     if(length(starting_fun_eff)!=length(starting_gen)){stop("Check genotype and functional effect association")}
     path_sim<-paste(path,"/sim",Nexp,sep="")
-    if (!file.exists(path_sim)) {
-      dir.create(path_sim,recursive =TRUE)
-    }
+    unlink(path_sim,recursive =TRUE)
+    dir.create(path_sim,recursive =TRUE)
+    
     gc()
     
     starting_pop<-mapply(genotype=starting_gen,
@@ -45,6 +45,8 @@ simulazione<-function(Nexp,seed,path,starting_gen,starting_fun_eff,Ncells_start,
       )
       
       time_provv<-0
+      unlink(path_sim,recursive =TRUE)
+      dir.create(path_sim,recursive =TRUE)
       save(list = c("Zprovv","time_provv"),
            file=paste(path_sim,"/Zprovv",count,".RData",sep=""))
       check_cond_end<-TRUE
@@ -92,7 +94,7 @@ simulazione<-function(Nexp,seed,path,starting_gen,starting_fun_eff,Ncells_start,
         if(length(Zprovv)==0||sum(sapply(Zprovv,Ncells))==0){
           check_cond_end<-FALSE
         }else if(is.null(tmax)&!is.null(Ncellsmax)){
-            check_cond_end<-(sum(sapply(Zprovv,Ncells))<Ncellsmax)
+            check_cond_end<-(sum(sapply(Zprovv,Ncells))<Ncellsmax)&(time_provv<max(parameters@print_time))
           }else{
             check_cond_end<-(time_provv<tmax)
           }

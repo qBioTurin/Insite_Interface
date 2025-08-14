@@ -46,7 +46,7 @@ simulazione(Nexp=Nexp,
             starting_gen = starting_gen,
             starting_fun_eff=starting_fun_eff,
             tmax=tmax,
-            Ncellsmax = NULL,
+            Ncellsmax = Ncellsmax,
             Ncells_start = Ncells_start,
             parameters = parameters)
 
