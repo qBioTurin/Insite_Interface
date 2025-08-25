@@ -89,7 +89,7 @@ simulazione<-function(Nexp,seed,path,starting_gen,starting_fun_eff,Ncells_start,
                        W,
                        MoreArgs =list(local_params),SIMPLIFY = TRUE)%>%unlist()
         
-        time_provv<-time_provv+local_params@Delta#*parameters@av_lifespan
+        time_provv<-time_provv+local_params@Delta*parameters@av_lifespan
 
         if(length(Zprovv)==0||sum(sapply(Zprovv,Ncells))==0){
           check_cond_end<-FALSE

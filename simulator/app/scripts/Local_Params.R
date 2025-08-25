@@ -37,7 +37,7 @@ setMethod("get_local_params",
               return(rel_freq/sum(rel_freq))
             })
             lambda_local<-Parameters@lambda[populations_conv]*(1-weighted_sums_local/Parameters@K[populations_conv])
-            b_local<-rep(1/Parameters@av_lifespan,length(populations_conv))
+            b_local<-rep(1,length(populations_conv))
             a_local<-(lambda_local+b_local)/(Parameters@mu[populations_conv]+1)
             b_local[a_local<0]<--lambda_local[a_local<0]
             a_local[a_local<0]<-0
@@ -58,7 +58,7 @@ setMethod("get_local_params",
             
             
             if(time_provv+Delta*Parameters@av_lifespan>Parameters@print_time[count+1]){ # SE SUPERO PRINT TIME mi fermo lì
-              Delta<-(Parameters@print_time[count+1]-time_provv)#/Parameters@av_lifespan
+              Delta<-(Parameters@print_time[count+1]-time_provv)/Parameters@av_lifespan
             }
             local_Params<-new("Local_Params",
                               phenotypes_local=phenotypes_local,

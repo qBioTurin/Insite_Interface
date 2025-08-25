@@ -129,7 +129,7 @@ if(length(k)>0){
 if(!is.null(tmax)){
   print_time<-round(seq(from=0,to=tmax, length.out = Np+1), 4)[-1]
 }else{
-  print_time<-cumsum(rep(save_day,floor(50*365/save_day)))
+  print_time<-cumsum(rep(save_day,floor(100*365/save_day)))
 }
 
 parameters<-new("Parameters",
