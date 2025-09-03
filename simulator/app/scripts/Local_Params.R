@@ -60,6 +60,8 @@ setMethod("get_local_params",
             if(time_provv+Delta*Parameters@av_lifespan>Parameters@print_time[count+1]){ # SE SUPERO PRINT TIME mi fermo lì
               Delta<-(Parameters@print_time[count+1]-time_provv)/Parameters@av_lifespan
             }
+            Delta<-min(5,Delta)
+
             local_Params<-new("Local_Params",
                               phenotypes_local=phenotypes_local,
                               a_local=as.list(a_local),
@@ -92,8 +94,8 @@ setMethod("get_p",
               else{
                 lambda<-a-b
                 const<-(exp(lambda*Delta)-1)/(a*exp(lambda*Delta)-b)
-                alpha=b*const
-                beta=a*const
+                alpha=(exp(lambda*Delta)-1)/(a*exp(lambda*Delta)/b-1)
+                beta=(exp(lambda*Delta)-1)/(exp(lambda*Delta)-b/a)
                 p_new<-alpha
                 p<-p_new
                 m<-2
