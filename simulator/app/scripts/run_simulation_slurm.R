@@ -4,7 +4,7 @@ source("scripts/Utils.R")
 source("scripts/Population.R")
 source("scripts/Local_Params.R")
 source("scripts/Population_with_size_nmut.R")
-source("scripts/Simulazioni_fenotipo_classi.R")
+source("scripts/Simulation_onlylast.R")
 
 option_list<-list(
   make_option(
