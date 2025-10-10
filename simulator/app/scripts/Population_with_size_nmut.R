@@ -66,7 +66,7 @@ setMethod("get_mut",
             mu_local<-local_params@mu_local[sapply(local_params@phenotypes_local,identical,phenotype(Population_old))][[1]]
             influenced_prob<-local_params@rel_freq_local[sapply(local_params@phenotypes_local,identical,phenotype(Population_old))][[1]]
             Delta<-local_params@Delta
-            sum_size<-Population_with_size_nmut_old@Ncells+Population_with_size_nmut@Ncells
+            sum_size<-sum(Population_with_size_nmut_old@Ncells,Population_with_size_nmut@Ncells)
             if(mu_local*(Delta/2)*sum_size>.Machine$integer.max){
               nmut<-rnorm(1,mu_local*(Delta/2)*sum_size,sqrt(mu_local*(Delta/2)*sum_size))
             }

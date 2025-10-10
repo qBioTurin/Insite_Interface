@@ -84,14 +84,37 @@ setMethod("get_p",
                 p_new<-(a*Delta)/(1+a*Delta)
                 p<-p_new
                 m<-2
+                start_time <- Sys.time()
+                
                 while(p_new>0){
                   p_new<-(a*Delta)^(m-2)/(1+a*Delta)^m
                   p<-c(p,p_new)
                   m<-m+1
+                  
+                  elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+                  if (elapsed > 60) {
+                    message("Warning: approximation made on the probability estimation")
+                    break
+                  }
                 }
                 p<-p[-length(p)]
-              }
-              else{
+              }else if(a==0){
+                p<-c(1-exp(-b*Delta),exp(-b*Delta))
+              }else if(b==0){
+                p_new<-exp(-a*Delta)/(1-exp(-a*Delta))
+                p<-p_new
+                start_time <- Sys.time()
+                
+                while(p_new>0){
+                  p_new<-p_new*(1-exp(-a*Delta))
+                  p<-c(p,p_new)
+                  elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+                  if (elapsed > 60) {
+                    message("Warning: approximation made on the probability estimation")
+                    break
+                  }
+                }
+              }else{
                 lambda<-a-b
                 const<-(exp(lambda*Delta)-1)/(a*exp(lambda*Delta)-b)
                 alpha=(exp(lambda*Delta)-1)/(a*exp(lambda*Delta)/b-1)
@@ -99,10 +122,17 @@ setMethod("get_p",
                 p_new<-alpha
                 p<-p_new
                 m<-2
+                start_time <- Sys.time()
+                
                 while(p_new>0){
                   p_new<-(1-alpha)*(1-beta)*beta^(m-2)
                   p<-c(p,p_new)
                   m<-m+1
+                  elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+                  if (elapsed > 60) {
+                    message("Warning: approximation made in get_p")
+                    break
+                  }
                 }
                 p<-p[-length(p)]
               }},
