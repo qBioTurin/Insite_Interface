@@ -114,7 +114,7 @@ setMethod("get_integral_error",
             lambda_local<-a_local-b_local
             #Delta<-local_params@Delta
             
-            if(lambda_local==0){
+            if(lambda_local==0|mu_local==0){
               error<-function(Delta){return(0)}
             }
             else{error<-function(Delta){

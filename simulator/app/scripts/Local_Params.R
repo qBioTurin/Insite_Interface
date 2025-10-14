@@ -61,6 +61,7 @@ setMethod("get_local_params",
               Delta<-(Parameters@print_time[count+1]-time_provv)/Parameters@av_lifespan
             }
             Delta<-min(5,Delta)
+            Delta<-min(abs(log(2)*(.Machine$double.max.exp-1)/lambda_local),Delta)
 
             local_Params<-new("Local_Params",
                               phenotypes_local=phenotypes_local,
@@ -100,7 +101,7 @@ setMethod("get_p",
                 p<-p[-length(p)]
               }else if(a==0){
                 p<-c(1-exp(-b*Delta),exp(-b*Delta))
-              }else if(b==0){
+                }else if(b==0){
                 p_new<-exp(-a*Delta)/(1-exp(-a*Delta))
                 p<-p_new
                 start_time <- Sys.time()
@@ -116,9 +117,16 @@ setMethod("get_p",
                 }
               }else{
                 lambda<-a-b
-                const<-(exp(lambda*Delta)-1)/(a*exp(lambda*Delta)-b)
+                
                 alpha=(exp(lambda*Delta)-1)/(a*exp(lambda*Delta)/b-1)
                 beta=(exp(lambda*Delta)-1)/(exp(lambda*Delta)-b/a)
+                if(beta==1){
+                  if(a>b){beta<-1-.Machine$double.eps}
+                  else{beta<-1+.Machine$double.eps}
+                }
+                if(alpha==0){
+                  alpha<-.Machine$double.xmin
+                }
                 p_new<-alpha
                 p<-p_new
                 m<-2

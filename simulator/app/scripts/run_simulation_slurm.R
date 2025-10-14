@@ -41,7 +41,7 @@ Nexp<-opt$Nexp
 load(opt$params_RData)
 
 simulazione(Nexp=Nexp,
-            seed=opt$seed,
+            seed=547033,#opt$seed,
             path = path_out,
             starting_gen = starting_gen,
             starting_fun_eff=starting_fun_eff,
