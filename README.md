@@ -1,5 +1,4 @@
 # InSiTE (In Silico Tumor Evolution):
-
 ## An R-based simulator providing insight into clonal dynamics
 
 This project implements a stochastic tumor evolution simulator based on branching processes to model the clonal dynamics of cancer growth under biologically interpretable mechanisms.
