@@ -6,12 +6,12 @@ The simulator tracks the expansion and interaction of multiple subclones over ti
 At the core of the model, each subclone follows a birth–death process whose parameters depend on its *phenotype*, i.e. the collection of functional events associated with its mutations.
 Five main functional mechanisms are implemented:
 
--   **Proliferative advantage** (dividing faster/dying slower).
+-   **Deregulation of the proliferation program** (dividing faster/dying slower).
     We map into this class all the functional capabilities that have an effect on the replication process of the cells: we may therefore include here the acquired abilities in sustaining the proliferative signaling, in evading growth suppressors, in deregulating the cellular metabolism, in resisting cells death, in enabling the replicative immortality and in avoiding the immune destruction.
     The simplified functional effect is a a boost in the growth of the cell by either diminishing the expected time required before a cell encounters duplication -a progression through the cell cycle- and by increasing the replicative potential -immortality-, or enlarging lifespan -circumvention of the apoptotic program-.
     The homeostasis of cell number and the maintenance of normal tissue architecture and function is lost and a surplus in the number of births compared to the number of deaths is observed.
 
--   **Genomic instability** (mutating more often).
+-   **Mutation burden augmentation** (mutating more often).
     Whenever the DNA is duplicated, there is a possibility of running into an error: this can be measured in terms of number of errors per cell division divided the number of base-pairs in order to obtain a standard mutation rate.
     There is evidence that the acquisition of the hallmarks of cancer is made possible by several enabling characteristics, among which the most prominent is the development of genomic instability that increases the mutation rate on tumor cells, as the succession of the alterations in the genomes of neoplastic cells results in the acquisition of function-altering mutations which enable the development of different capabilities.
 
@@ -45,7 +45,7 @@ This produces a synthetic VCF file ready for downstream analysis.
 
 ## Demo
 
-Insert gif or link to demo
+
 
 ## Documentation
 
