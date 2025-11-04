@@ -25,7 +25,7 @@ interface SimulationStep {
 export const useSimulationStepStore = create<SimulationStep>((set) => ({
 	cellLifeDays: 4,
 	carryingCapacity: 1e6,
-	mutationRate: 8e-9,
+	mutationRate: 2.66e-9,
 	mutableBases: 5000,
 
 	endingTime: 365,

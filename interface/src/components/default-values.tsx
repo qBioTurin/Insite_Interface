@@ -1,5 +1,5 @@
 export const defaultEventParams = {
-	proliferativeAdvantage: 0.004,
+	proliferativeAdvantage: 0.01,
 	mutationalAmplificationFactor: Math.log10(2),
 	additionalSpace: 6,
 	susceptibility: 1,

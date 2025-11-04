@@ -17,10 +17,10 @@ export function CardGrowth({ event, removeEvent, updateEventName, updateEventPar
 			<Text mt="md" size="sm" mb={"xs"}>
 				Proliferative advantage:
 			</Text>
-			<Slider mb={"md"} color={colors.growth} onChange={(value) => updateEventParam(event, "proliferativeAdvantage", value)} value={event.params?.proliferativeAdvantage} min={0} max={0.1} step={0.001} marks={[
-				{ value: 0.02, label: '0.02' },
+			<Slider mb={"md"} color={colors.growth} onChange={(value) => updateEventParam(event, "proliferativeAdvantage", value)} value={event.params?.proliferativeAdvantage} min={0} max={0.2} step={0.001} marks={[
 				{ value: 0.05, label: '0.05' },
-				{ value: 0.08, label: '0.08' },
+				{ value: 0.10, label: '0.10' },
+				{ value: 0.15, label: '0.15' }
 			]} />
 		</Card>
 	)
