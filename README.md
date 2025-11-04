@@ -26,7 +26,8 @@ The simulator can also generate synthetic sequencing data: at any timepoint, a s
 -   [\@Gepiro](https://github.com/Gepiro)
 
 ## Demo
-<video src="assets/App_DEMO.mov" autoplay loop muted playsinline></video>
+
+\![Demo](assets/App_DEMO.mov)
 
 ## Documentation
 
