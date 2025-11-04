@@ -27,7 +27,7 @@ The simulator can also generate synthetic sequencing data: at any timepoint, a s
 
 ## Demo
 
-\![Demo](assets/App_DEMO.mov)
+[![Demo](assets/App_DEMO_thumbnail.png)](assets/App_DEMO.mov)
 
 ## Documentation
 
