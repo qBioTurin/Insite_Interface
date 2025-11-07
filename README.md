@@ -1,5 +1,8 @@
-<img width="2062" height="572" alt="Opera_senza_titolo-2" src="https://github.com/user-attachments/assets/3e32434a-7ab1-4d48-8876-6929a835b276" />
-# InSiTE (In Silico Tumor Evolution)
+
+<img width="2649" height="572" alt=" 3" src="https://github.com/user-attachments/assets/f8b03643-5fb3-4d04-9ef5-2f6c0ed9d820" />
+
+# In Silico Tumor Evolution
+
 Tumor Evolution): An R-based simulator providing insight into clonal dynamics
 
 This project implements a stochastic tumor evolution simulator based on branching processes to model the clonal dynamics of cancer growth under biologically interpretable mechanisms. The simulator tracks the expansion and interaction of multiple subclones over time, accounting for selective pressures, competition, and random evolutionary events that can drive shifts in tumor composition.
