@@ -1,5 +1,5 @@
 
-<img width="2649" height="572" alt=" 3" src="https://github.com/user-attachments/assets/f8b03643-5fb3-4d04-9ef5-2f6c0ed9d820" />
+<img width="1703" height="380" alt="Opera_senza_titolo 2" src="https://github.com/user-attachments/assets/9ff1212f-aed2-4611-929e-6b40f45b791e" />
 
 # In Silico Tumor Evolution
 
