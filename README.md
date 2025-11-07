@@ -3,7 +3,7 @@
 
 # In Silico Tumor Evolution
 
-Tumor Evolution): An R-based simulator providing insight into clonal dynamics
+**An R-based simulator providing insight into clonal dynamics**
 
 This project implements a stochastic tumor evolution simulator based on branching processes to model the clonal dynamics of cancer growth under biologically interpretable mechanisms. The simulator tracks the expansion and interaction of multiple subclones over time, accounting for selective pressures, competition, and random evolutionary events that can drive shifts in tumor composition.
 
