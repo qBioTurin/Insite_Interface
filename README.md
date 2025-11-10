@@ -52,6 +52,7 @@ Windows
 ``` bash
  docker-compose up --build
 ```
+Then, copy the local-host link and paste it into your browser.
 
 ## Support
 
