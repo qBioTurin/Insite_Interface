@@ -1,4 +1,9 @@
-# InSiTE (In Silico Tumor Evolution): An R-based simulator providing insight into clonal dynamics
+
+<img width="1703" height="380" alt="Opera_senza_titolo 2" src="https://github.com/user-attachments/assets/9ff1212f-aed2-4611-929e-6b40f45b791e" />
+
+# In Silico Tumor Evolution
+
+**An R-based simulator providing insight into clonal dynamics**
 
 This project implements a stochastic tumor evolution simulator based on branching processes to model the clonal dynamics of cancer growth under biologically interpretable mechanisms. The simulator tracks the expansion and interaction of multiple subclones over time, accounting for selective pressures, competition, and random evolutionary events that can drive shifts in tumor composition.
 
@@ -47,12 +52,11 @@ Windows
 ``` bash
  docker-compose up --build
 ```
+Then, copy the local-host link and paste it into your browser.
 
 ## Support
 
 For support, email [fake\@fake.com](mailto:fake@fake.com){.email} or join our Slack channel.
-
-![Logo](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/th5xamgrr6se0x5ro4g6.png)
 
 ## Badges
 
