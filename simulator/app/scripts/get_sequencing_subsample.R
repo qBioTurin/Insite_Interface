@@ -33,7 +33,7 @@ path_out<-opt$path_out
 num_seq<-opt$num_seq
 
 load(paste(path_in,"/Parameters.RData",sep=""))
-load(paste(path_in,"mut_names_tbl.RData",sep="/"))
+#load(paste(path_in,"mut_names_tbl.RData",sep="/"))
 
 
 Nexp<-1

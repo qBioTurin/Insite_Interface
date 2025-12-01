@@ -56,8 +56,6 @@ if(retrieve_seed){
 set.seed(seed_selected)
 
 load(paste(path_in,"/Parameters.RData",sep=""))
-load(paste(path_in,"mut_names_tbl.RData",sep="/"))
-
 
 json_palette<-fromJSON(file=json_palette_file)
 palette<-sapply(json_palette,function(el){el$color})
@@ -107,14 +105,20 @@ sample_DP<-round(sample(x = dens_coverage$x, nrow(Clones_df_seq), prob = dens_co
 sample_DP[sample_DP<0]<-0
 sample_AD<-mapply(rbinom,prob=Clones_df_seq$prob,size=sample_DP,MoreArgs = list(n=1))
 
+
 vcf_sample<-Clones_df_seq%>%
   bind_cols(sample_DP=sample_DP,sample_AD=sample_AD)%>%
   filter(sample_AD>0)%>%
   mutate(VAF=sample_AD/sample_DP)%>%
-  merge(mut_names_tbl)%>%
-  dplyr::select(-c(prob,Ncells_seq,mut))%>%
-  rename("mut"="names")
+  dplyr::select(-c(prob,Ncells_seq))
 
+if(file.exists(paste(path_in,"mut_names_tbl.RData",sep="/"))){
+  load(paste(path_in,"mut_names_tbl.RData",sep="/"))
+  vcf_sample<-vcf_sample%>%
+    merge(mut_names_tbl)%>%
+    dplyr::select(-mut)%>%
+    rename("mut"="names")
+}
 
 
 write(jsonlite::toJSON(vcf_sample,auto_unbox = FALSE),file=paste(path_out,"vcf_sampled.json",sep="/"))
