@@ -4,16 +4,36 @@ source("scripts/Population.R")
 source("scripts/Local_Params.R")
 source("scripts/Population_with_size_nmut.R")
 
-args<-commandArgs(trailingOnly = TRUE)
-if(interactive()){
-  args <- c("raw",140,"output")
-}
-path_in<-args[1]
-path_out<-args[3]
+option_list<-list(
+  make_option(
+    c("--path_in"),
+    type="character",
+    default = "raw",
+    help = "path to the folder in which the get_obs_tum.R output is stored"
+  ),
+  make_option(
+    c("--num_seq"),
+    type="numeric",
+    default = 1,
+    help = "simulation step to be sequenced"
+  ),
+  make_option(
+    c("--path_out"),
+    type="character",
+    default = "output",
+    help = "path to the folder in which the tibble is going to be saved"
+  )
+)
+
+opt_parser<-OptionParser(option_list = option_list)
+opt<-parse_args(opt_parser)
+
+path_in<-opt$path_in
+path_out<-opt$path_out
+num_seq<-opt$num_seq
 
 load(paste(path_in,"/Parameters.RData",sep=""))
 
-num_seq<-as.numeric(args[2])
 Nexp<-1
 
 load(paste(path_in,"/sim",Nexp,"/Zprovv",num_seq,".RData",sep=""))
