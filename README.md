@@ -54,9 +54,6 @@ Windows
 ```
 Then, copy the local-host link and paste it into your browser.
 
-## Support
-
-For support, email [fake\@fake.com](mailto:fake@fake.com){.email} or join our Slack channel.
 
 ## Badges
 
