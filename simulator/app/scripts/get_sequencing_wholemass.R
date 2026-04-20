@@ -1,15 +1,26 @@
-source("scripts/libraries.R")
-source("scripts/Utils.R")
-source("scripts/Population.R")
-source("scripts/Local_Params.R")
-source("scripts/Population_with_size_nmut.R")
+library(Insite)
+library(dplyr)
+library(ggplot2)
+if (!require("optparse")) {
+  install.packages("optparse",repos = "https://cloud.r-project.org")
+  library(optparse)}
+if (!require("rjson")) {
+  install.packages("rjson",repos = "https://cloud.r-project.org")
+  library(rjson)
+}
 
 option_list<-list(
   make_option(
-    c("--path_in"),
+    c("--sim_dir"),
     type="character",
-    default = "raw",
-    help = "path to the folder in which the get_obs_tum.R output is stored"
+    default = "raw/sim1",
+    help = "path to the folder in which the simulation outputs is stored"
+  ),
+  make_option(
+    c("--params"),
+    type="character",
+    default = "raw/Parameters.RData",
+    help = "path of the .RData file with the elaborated parameters"
   ),
   make_option(
     c("--num_seq"),
@@ -28,15 +39,17 @@ option_list<-list(
 opt_parser<-OptionParser(option_list = option_list)
 opt<-parse_args(opt_parser)
 
-path_in<-opt$path_in
+path_sim <- opt$sim_dir
+path_params <- opt$params
 path_out<-opt$path_out
 num_seq<-opt$num_seq
 
-load(paste(path_in,"/Parameters.RData",sep=""))
+if(!dir.exists(path_out)){dir.create(path_out)}
 
-Nexp<-1
+load(path_params)
 
-load(paste(path_in,"/sim",Nexp,"/Zprovv",num_seq,".RData",sep=""))
+
+load(paste(path_sim,"/Zprovv",num_seq,".RData",sep=""))
 time_provv<-parameters@print_time[which.min(abs(time_provv-parameters@print_time))]
 
 
@@ -62,17 +75,17 @@ not_used_mut_nums<-mut_nums[!mut_nums%in%used_nums]
 mut_names_tbl<-tibble(mut=c(mut_names,all_mut[!all_mut%in%mut_names]),
                       names=c(names(mut_names),paste0("Mut",not_used_mut_nums,sep="",recycle0 = TRUE)))
 
-save(mut_names_tbl,file=paste(path_in,"mut_names_tbl.RData",sep="/"))
+save(mut_names_tbl,file=paste(path_out,"mut_names_tbl.RData",sep="/"))
 pop_nmut<-tibble(ncells=sapply(split(ncells,nmut_in_gen), sum),
        npop=table(nmut_in_gen))
 
-write(toJSON(pop_nmut),file = paste(path_in,"seq_barplot_df.json",sep="/"))
+write(toJSON(pop_nmut),file = paste(path_out,"seq_barplot_df.json",sep="/"))
 
 parents<-lapply(unique_mut_id,lag)
 mut_generation<-sapply(gen, function(g){1:length(g)})
 
 composition<-tibble(mut=unique_mut_id,parents,fun_eff,ncells,mut_generation)%>%
-  unnest(c(mut,parents,fun_eff,mut_generation))%>%
+  tidyr::unnest(c(mut,parents,fun_eff,mut_generation))%>%
   group_by(mut,parents,fun_eff,mut_generation)%>%
   summarise(ncells=sum(ncells),
             frequency=ncells/tot_ncells)%>%
@@ -82,7 +95,7 @@ composition<-tibble(mut=unique_mut_id,parents,fun_eff,ncells,mut_generation)%>%
 
 
 hist_df<-composition%>%dplyr::select(fun_eff,frequency)
-write(toJSON(hist_df),file = paste(path_in,"seq_hist_df.json",sep="/"))
+write(toJSON(hist_df),file = paste(path_out,"seq_hist_df.json",sep="/"))
 hist_plot<-ggplot(hist_df)+
   geom_histogram(aes(x=frequency),fill="#AFABAB")+
   theme_void()+
@@ -116,7 +129,7 @@ if(length(roots)>1){
     bind_rows(tibble(mut="0"))
 }
 
-p<-get_tree_plot_app(composition,palette)
+p<-Insite:::get_tree_plot_app(composition,palette)
 
 p
 ggsave(p,device = "png",
@@ -125,7 +138,7 @@ ggsave(p,device = "png",
 
 
 table_pops<-tibble(pop_id=1:length(pop),mut=unique_mut_id,fun_eff)%>%
-  unnest(c(mut,fun_eff))%>%
+  tidyr::unnest(c(mut,fun_eff))%>%
   merge(mut_names_tbl)%>%
   group_by(pop_id)%>%
   summarise(

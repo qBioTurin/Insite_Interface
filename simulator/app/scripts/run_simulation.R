@@ -1,10 +1,11 @@
-#source("scripts/install_libraries.R")
-source("scripts/libraries.R")
-source("scripts/Utils.R")
-source("scripts/Population.R")
-source("scripts/Local_Params.R")
-source("scripts/Population_with_size_nmut.R")
-source("scripts/Simulazioni_fenotipo_classi.R")
+library(Insite)
+if (!require("optparse")) {
+  install.packages("optparse",repos = "https://cloud.r-project.org")
+  library(optparse)}
+if (!require("rjson")) {
+  install.packages("rjson",repos = "https://cloud.r-project.org")
+  library(rjson)
+}
 
 option_list<-list(
   make_option(
@@ -39,20 +40,24 @@ opt<-parse_args(opt_parser)
 json_data <- fromJSON(file=opt$params)
 path<-opt$dir
 
-source("scripts/inport_par.R")
+if(!dir.exists(path)){dir.create(path)}
+
+import_json_par(json_data,path)
+
 load(paste(path,"/Parameters.RData",sep=""))
 
 write(opt$seed,file=paste(path,"/seed.txt",sep=""))
 
 Nexp<-opt$Nexp
 
-simulazione(Nexp=Nexp,
+simulation(Nexp=Nexp,
             seed=opt$seed,
             path = path,
             starting_gen = starting_gen,
             starting_fun_eff=starting_fun_eff,
             tmax=tmax,
-            Ncellsmax = NULL,
+            Ncellsmax = Ncellsmax,
             Ncells_start = Ncells_start,
-            parameters = parameters)
+            parameters = parameters,
+            epsilon_rel=10^(-3))
 
