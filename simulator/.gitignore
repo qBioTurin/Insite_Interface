@@ -12,3 +12,5 @@ app/raw
 app/output
 app/label_color.json
 !dens.RData
+*.RDataTmp*
+seed.txt
