@@ -32,7 +32,7 @@ option_list<-list(
   make_option(
     c("--num_seq"),
     type="numeric",
-    default = Inf,
+    default = 1,
     help = "simulation step to be sequenced"
   ),
   make_option(
@@ -68,7 +68,7 @@ opt<-parse_args(opt_parser)
 path_sim <- opt$sim_dir
 path_params <- opt$params
 path_out <- opt$path_out
-seq_day<-opt$num_seq
+num_seq<-opt$num_seq
 Clones_ordered_path<-opt$neighborhood
 path_plot_data<-opt$plot_data
 path_mut_names_tbl<-opt$mut_names_tbl
@@ -81,13 +81,7 @@ sim_files <- sim_files[grepl("Zprovv", sim_files)]
 
 index_files <- as.numeric(str_remove(str_remove(sim_files, "Zprovv"), ".RData"))
 
-if (seq_day == Inf) {
-  Zprovv_file <- sim_files[which.max(index_files)]
-} else {
-  Zprovv_file <- sim_files[
-    index_files == which.min(abs(parameters@print_time - seq_day))
-  ]
-}
+Zprovv_file <- paste("Zprovv",num_seq,".RData",sep="")
 
 load(file.path(path_sim, Zprovv_file))
 ncells<-sapply(Zprovv,Ncells)
