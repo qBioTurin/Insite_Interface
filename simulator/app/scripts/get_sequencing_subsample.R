@@ -91,7 +91,7 @@ if(n_seq_cells<1){n_seq_cells<-sum(ncells)}
 
 if(is.null(Clones_ordered_path)){
   Clones_df<-Insite:::get_ordered_clones_sequencing(Zprovv)
-  save(Clones_df,file = paste0(path_out,"/Clones_ordered_",seq_day,".RData"))
+  save(Clones_df,file = paste0(path_out,"/Clones_ordered_",num_seq,".RData"))
 }else{
   load(Clones_ordered_path)
 }
