@@ -22,14 +22,14 @@ export default function SequencingSection() {
 		setLoading(true)
 		var subsample: any
 		if (firstSubsampled) {
-			subsample = await fetch(`/api/get_sequencing_subsample?numSeq=${numSeq}`, {
+			subsample = await fetch(`/api/get_sequencing_subsample?numSeq=${numSeq}&first=true`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
 				}
 			})
 		} else {
-			subsample = await fetch(`/api/get_sequencing_subsample?numSeq=${numSeq}&first=false`, {
+			subsample = await fetch(`/api/get_sequencing_subsample?numSeq=${numSeq}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',

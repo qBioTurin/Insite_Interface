@@ -52,7 +52,7 @@ def get_obs_tum():
     depth = request.args.get("depth")
     try:
         subprocess.run(
-            ["Rscript", "/app/scripts/get_obs_tum.R", "--path", "/data", "--depth", depth],
+            ["Rscript", "/app/scripts/derive_visible_clones.R", "--sim_dir", "/data/sim1", "--params", "/data/Parameters.RData", "--path_out", "/data", "--depth", depth],
             capture_output=True,
             text=True
         )
@@ -78,7 +78,7 @@ def draw_plot():
             json.dump(param, f, indent=4)
 
         subprocess.run(
-            ["Rscript", "/app/scripts/draw_plot.R", "--path_in", "/data", "--json_palette_file",  "/data/labeled_colors.json", "--path_out", "/data"],
+            ["Rscript", "/app/scripts/plot_sim.R", "--obs_tum", "/data/obs_tumor.RData", "--json_palette_file",  "/data/labeled_colors.json", "--params", "/data/Parameters.RData", "--path_out", "/data"],
             capture_output=True,
             text=True
         )
@@ -158,7 +158,7 @@ def get_sequencing():
     numSeq = request.args.get("numSeq")
     try:
         subprocess.run(
-            ["Rscript", "/app/scripts/get_sequencing_wholemass.R", "--path_in", "/data", "--num_seq", numSeq, "--path_out", "/data"],
+            ["Rscript", "/app/scripts/get_sequencing_wholemass.R", "--sim_dir", "/data/sim1", "--params", "/data/Parameters.RData", "--num_seq", numSeq, "--path_out", "/data"],
             capture_output=True,
             text=True
         )
@@ -180,19 +180,16 @@ def get_sequencing():
 def get_sequencing_subsample():
     numSeq = request.args.get("numSeq")
     first = request.args.get("first")
-    color = request.args.get("color")
     try:
-        if(first != 'false'):
+        if(first):
            subprocess.run(
-            ["Rscript", "/app/scripts/get_sequencing_subsample.R", "--path_in", "/data", "--num_seq", numSeq, "--path_out", "/data"],
+            ["Rscript", "/app/scripts/get_sequencing_subsample.R", "--sim_dir", "/data/sim1", "--params", "/data/Parameters.RData", "--num_seq", numSeq, "--path_out", "/data", "--plot_data", "/data/Clones_df_absolute.RData", "--json_palette_file", "/data/labeled_colors.json", "--mut_names_tbl", "/data/mut_names_tbl.RData"],
             capture_output=True,
             text=True
            )
-           
-        color = 'TRUE' if color == 'true' else "FALSE"
-        
-        subprocess.run(
-            ["Rscript", "/app/scripts/redo_get_sequencing_subsample.R", "--path_in", "/data", "--num_seq", numSeq, "--path_out", "/data", "--json_palette_file", "/data/labeled_colors.json", "--retrieve_seed", color],
+        else:
+            subprocess.run(
+            ["Rscript", "/app/scripts/get_sequencing_subsample.R", "--sim_dir", "/data/sim1", "--params", "/data/Parameters.RData", "--num_seq", numSeq, "--path_out", "/data", "--plot_data", "/data/Clones_df_absolute.RData", "--json_palette_file", "/data/labeled_colors.json", "--mut_names_tbl", "/data/mut_names_tbl.RData", "--neighbourhood", f"/data/clones_ordered_{numSeq}.RData"],
             capture_output=True,
             text=True
         )

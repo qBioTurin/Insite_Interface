@@ -20,7 +20,7 @@ export const useFunctionalEventsStore = create<FunctionalEvents>((set, get) => (
 	functionalEvents: [
 		{ id: 1, name: "Growth1", type: "growth", frequency: defaultFrequency, params: { proliferativeAdvantage: defaultEventParams.proliferativeAdvantage } },
 		{ id: 2, name: "Competition2", type: "competition", frequency: defaultFrequency, params: { susceptibility: defaultEventParams.susceptibility, offensiveScore: defaultEventParams.offensiveScore } },
-		{ id: 3, name: "Passenger3", type: "passenger", frequency: defaultFrequencyPassenger },
+		{ id: 3, name: "Space3", type: "space", frequency: defaultFrequency, params: { additionalSpace: defaultEventParams.additionalSpace } },
 	],
 	nextFunctionalEventId: 4,
 

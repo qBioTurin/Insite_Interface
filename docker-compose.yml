@@ -1,8 +1,6 @@
 services:
   interface:
-    build:
-      context: interface
-      dockerfile: Dockerfile
+    image: qbioturin/insite_interface:0.1.0
     restart: unless-stopped
     networks:
       - cancersimulation-network
@@ -10,14 +8,10 @@ services:
       - "3000:3000"
 
   simulator:
-    build:
-      context: simulator
-      dockerfile: Dockerfile
+    image: qbioturin/insite_simulator:0.1.0
     restart: unless-stopped
     networks:
       - cancersimulation-network
-    volumes:
-      - './simulator/data:/data'
 
 networks:
   cancersimulation-network:
