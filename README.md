@@ -34,8 +34,8 @@ The simulator can also generate synthetic sequencing data: at any timepoint, a s
 Clone the git with
 
 ``` bash
-  git clone git@github.com:qBioTurin/CancerSimulationInterface.git
-  cd CancerSimulationInterface
+  git clone git@github.com:qBioTurin/Insite_Interface.git
+  cd Insite_Interface
 ```
 
 Then run the Docker, based on your operative system:
@@ -43,16 +43,16 @@ Then run the Docker, based on your operative system:
 MacOS/Linux
 
 ``` bash
- docker compose up --build
+ docker compose up
 ```
 
 Windows
 
 ``` bash
- docker-compose up --build
+ docker-compose up
 ```
 
-Then, copy the local-host link and paste it into your browser.
+Then, open into your browser [localhost:3000](http://localhost:3000).
 
 
 # Authors
