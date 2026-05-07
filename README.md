@@ -27,7 +27,6 @@ The simulator can also generate synthetic sequencing data: at any timepoint, a s
 
 ![Demo](assets/App_DEMO.gif)
 
-## Documentation
 
 ## Installation
 
@@ -54,6 +53,15 @@ Windows
 
 Then, open into your browser [localhost:3000](http://localhost:3000).
 
+## Test Environment
+
+The tool was successfully tested under the following configurations:
+
+| Operating System | Version | Architecture |
+| :--- | :--- | :--- |
+| Windows | 11 24H2 | x64 |
+| macOS | Tahoe 26.0.1 | Apple Silicon (M1) |
+| Rocky Linux | 9.7 | x64 |
 
 # Authors
 
