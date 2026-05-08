@@ -6,7 +6,7 @@
 This repository provides a Docker-based **Next.js** graphical user interface for running and analyzing single simulations in a user-friendly environment. The interface relies on the simulation framework implemented in the companion reproducibility repository.
 
 The project ecosystem also includes:
-- **[Insite]([https://github.com/qBioTurin/Insite_Interface](https://github.com/qBioTurin/Insite.git)):** The core R simulation framework underlying the interface. This repository can also be used independently of the web application through standalone scripts for large-scale and parallelized simulations, downstream analyses, and figure generation. It additionally contains all scripts required to reproduce the analyses and figures presented in the manuscript.
+- **[Insite](https://github.com/qBioTurin/Insite.git):** The core R simulation framework underlying the interface. This repository can also be used independently of the web application through standalone scripts for large-scale and parallelized simulations, downstream analyses, and figure generation. It additionally contains all scripts required to reproduce the analyses and figures presented in the manuscript.
 - **[Zenodo Dataset](https://doi.org/10.5281/zenodo.19821839):** A permanent archive containing the complete raw simulation outputs used in the study.
 
 ---
