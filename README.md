@@ -71,7 +71,7 @@ The tool was successfully tested under the following configurations:
 | Operating System | Version | Architecture |
 | :--- | :--- | :--- |
 | Windows | 11 24H2 | x64 |
-| macOS | Tahoe 26.0.1 | Apple Silicon (M1) |
+| macOS | Tahoe 26.0.1 | Apple Silicon (M1,M4) |
 | Rocky Linux | 9.7 | x64 |
 
 ---
