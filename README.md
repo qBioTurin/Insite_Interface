@@ -34,7 +34,7 @@ For further details, refer to the [associated publication](https://www.biorxiv.o
 Clone the git with
 
 ``` bash
-  git clone git@github.com:qBioTurin/Insite_Interface.git
+  git clone https://github.com/qBioTurin/Insite_Interface.git
   cd Insite_Interface
 ```
 
