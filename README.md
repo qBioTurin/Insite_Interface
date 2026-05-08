@@ -71,7 +71,7 @@ The tool was successfully tested under the following configurations:
 
 To ensure both user-friendliness and scientific reproducibility, the project is organized into two complementary repositories:
 
-- **Insite (This Repository):** A Docker-based `Next.js` application providing a graphical user interface for configuring, running, and analyzing single simulations in an interactive and user-friendly environment.
+- **Insite (This Repository):** A Docker-based Next.js application providing a graphical user interface for configuring, running, and analyzing single simulations in an interactive and user-friendly environment.
 - **[Insite]([https://github.com/qBioTurin/Insite_Interface](https://github.com/qBioTurin/Insite.git)):** The core R simulation framework underlying the interface. This repository can also be used independently of the web application through standalone scripts for large-scale and parallelized simulations, downstream analyses, and figure generation. It additionally contains all scripts required to reproduce the analyses and figures presented in the manuscript.
 
 ## 📄 Citation
