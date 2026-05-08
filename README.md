@@ -7,6 +7,8 @@ This repository provides a Docker-based **Next.js** graphical user interface for
 
 ---
 
+## About the Project
+
 This project implements a stochastic tumor evolution simulator based on branching processes to model the clonal dynamics of cancer growth under biologically interpretable mechanisms. The simulator tracks the expansion and interaction of multiple subclones over time, accounting for selective pressures, competition, and random evolutionary events that can drive shifts in tumor composition.
 
 At the core of the model, each subclone follows a birth–death process whose parameters depend on its *phenotype*, i.e. the collection of functional events associated with its mutations. Five main functional mechanisms are implemented:
