@@ -23,6 +23,8 @@ New mutations arise as a doubly stochastic Poisson process, with rates modulated
 Once the events and initial conditions are defined, the simulator runs and outputs cell counts for each subpopulation over a fixed number of timesteps. Results can be downloaded or visualized in the web interface through Muller plots and clonal tree plots.\
 The simulator can also generate synthetic sequencing data: at any timepoint, a subset of cells can be sampled, their mutations distributed across reads, randomly amplified, and subsampled to mimic sequencing coverage. This produces a synthetic VCF file ready for downstream analysis.
 
+For further details, refer to the [publication](https://www.biorxiv.org/content/10.64898/2026.02.06.704299v1.full)_.
+
 ## Demo
 
 ![Demo](assets/App_DEMO.gif)
@@ -62,6 +64,21 @@ The tool was successfully tested under the following configurations:
 | Windows | 11 24H2 | x64 |
 | macOS | Tahoe 26.0.1 | Apple Silicon (M1) |
 | Rocky Linux | 9.7 | x64 |
+
+---
+
+## 🌐 Project Ecosystem
+
+To ensure both user-friendliness and scientific reproducibility, the project is organized into two complementary repositories:
+
+- **Insite (This Repository):** A Docker-based \texttt{Next.js} application providing a graphical user interface for configuring, running, and analyzing single simulations in an interactive and user-friendly environment.
+- **[Insite]([https://github.com/qBioTurin/Insite_Interface](https://github.com/qBioTurin/Insite.git)):** The core R simulation framework underlying the interface. This repository can also be used independently of the web application through standalone scripts for large-scale and parallelized simulations, downstream analyses, and figure generation. It additionally contains all scripts required to reproduce the analyses and figures presented in the manuscript.
+
+## 📄 Citation
+
+If you use Insite in your research, please cite:
+
+> _Daniela Volpatto et al. (2026). A new cancer progression model: from synthetic tumors to real data and back. [bioRxiv](https://www.biorxiv.org/content/10.64898/2026.02.06.704299v1.full)_
 
 # Authors
 
