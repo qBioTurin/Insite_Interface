@@ -1,7 +1,11 @@
 <img src="https://github.com/user-attachments/assets/9ff1212f-aed2-4611-929e-6b40f45b791e" alt="Opera_senza_titolo 2" width="1703" height="380"/>
 
 # In Silico Tumor Evolution
-## Graphical User Interface of _A New Cancer Progression Model: From synthetic tumors to real data and back_
+## Graphical User Interface for _A New Cancer Progression Model: From synthetic tumors to real data and back_
+
+This repository provides a Docker-based **Next.js** graphical user interface for running and analyzing single simulations in a user-friendly environment. The interface relies on the simulation framework implemented in the companion reproducibility repository.
+
+---
 
 This project implements a stochastic tumor evolution simulator based on branching processes to model the clonal dynamics of cancer growth under biologically interpretable mechanisms. The simulator tracks the expansion and interaction of multiple subclones over time, accounting for selective pressures, competition, and random evolutionary events that can drive shifts in tumor composition.
 
