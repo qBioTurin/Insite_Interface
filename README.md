@@ -23,7 +23,7 @@ New mutations arise as a doubly stochastic Poisson process, with rates modulated
 Once the events and initial conditions are defined, the simulator runs and outputs cell counts for each subpopulation over a fixed number of timesteps. Results can be downloaded or visualized in the web interface through Muller plots and clonal tree plots.\
 The simulator can also generate synthetic sequencing data: at any timepoint, a subset of cells can be sampled, their mutations distributed across reads, randomly amplified, and subsampled to mimic sequencing coverage. This produces a synthetic VCF file ready for downstream analysis.
 
-For further details, refer to the [publication](https://www.biorxiv.org/content/10.64898/2026.02.06.704299v1.full)_.
+For further details, refer to the [associated publication](https://www.biorxiv.org/content/10.64898/2026.02.06.704299v1.full).
 
 ## Demo
 
